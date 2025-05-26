@@ -6,5 +6,8 @@ torchvision
 pyttsx3
 SpeechRecognition
 google-generativeai
-TTS
+edge_tts
+pygame
+pyaudio
+pandas
 sounddevice
