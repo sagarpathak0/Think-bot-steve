@@ -1,0 +1,56 @@
+What Can Steve (Think-Bot) Do?
+=============================
+
+
+1. Computer Vision:
+   - Detects faces in the camera feed using OpenCV Haarcascade.
+   - Recognizes and reads text from the camera using Tesseract OCR.
+   - Detects objects in the camera feed using YOLOv5 (PyTorch).
+   - Draws bounding boxes and overlays for faces, objects, and text in the OpenCV window.
+
+2. Personality & Customization:
+   - Remembers your name and preferences.
+   - Can change voice or speaking style on command.
+
+3. Extra Skills:
+   - Tells jokes, gives the current time, and (optionally) weather.
+
+4. Multilingual:
+   - Detects language and can translate between languages (using Google Translate API).
+
+5. Logging & Analytics:
+   - Logs all conversations and observations for later review.
+
+6. Modular Codebase:
+   - Code is organized into modules for TTS, memory, vision, speech, Gemini AI, personality, skills, visual feedback, logging, and multilingual support.
+   - Easy to extend and maintain.
+
+2. Speech Recognition:
+   - Listens for a wake word ("Steve") and responds only when addressed.
+   - Converts spoken commands to text using Google Speech Recognition.
+
+3. Conversational AI:
+   - Uses Gemini AI to generate context-aware, conversational responses.
+   - Maintains a conversation history for more natural interactions.
+
+4. Text-to-Speech (TTS):
+   - Speaks responses aloud using Coqui TTS (natural-sounding, non-blocking).
+   - Falls back to pyttsx3 TTS if Coqui is unavailable.
+
+5. Memory:
+   - Remembers recent conversation history and observations in memory.
+   - Saves and loads memory to/from a file (persistent across restarts).
+   - Can recall facts or previous statements using a "recall <keyword>" command.
+
+6. Modular Codebase:
+   - Code is organized into modules for TTS, memory, vision, speech, and Gemini AI.
+   - Easy to extend and maintain.
+
+How to Interact:
+----------------
+- Say "Steve" to wake the bot, then give your command.
+- Ask questions, request observations, or say "recall <something>" to retrieve past info.
+- Steve will respond both in text and with speech.
+
+---
+This file is up to date as of May 26, 2025.

@@ -1,0 +1,32 @@
+# SteveRLBot Setup Commands
+
+# 1. (Optional) Create and activate a virtual environment (recommended)
+python -m venv myenv
+
+# On Windows PowerShell:
+.\myenv\Scripts\Activate.ps1
+
+# 2. Upgrade pip (optional but recommended)
+pip install --upgrade pip
+
+# 3. Install required Python packages
+pip install -r requirements.txt
+
+# 4. (Optional) Download YOLOv5 weights if not present
+yolov5s.pt  # Already present in your workspace
+
+# 5. Run the main Steve bot
+python main.py
+
+# 6. Run the RL agent (modular DQN grid world)
+python -m RL.main_loop
+
+# 7. (Optional) Run tests
+python test.py
+
+# 8. (Optional) Deactivate the virtual environment when done
+deactivate
+
+# Notes:
+# - All commands should be run from the project root: c:\Users\sagar\OneDrive\desktop\MINI PROJECT
+# - If you use a different shell, adjust the activation command accordingly.

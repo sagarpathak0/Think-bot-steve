@@ -1,0 +1,10 @@
+googletrans==4.0.0rc1
+opencv-python
+pytesseract
+torch
+torchvision
+pyttsx3
+SpeechRecognition
+google-generativeai
+TTS
+sounddevice

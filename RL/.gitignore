@@ -1,0 +1,22 @@
+# Ignore Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignore model weights and RL artifacts
+steve_policy_net.pth
+steve_target_net.pth
+steve_memory.json
+
+# Ignore logs and outputs
+*.log
+*.png
+*.svg
+
+# Ignore Jupyter checkpoints
+.ipynb_checkpoints
+
+# Ignore virtual environments (if any)
+venv/
+ENV/
+myenv/
