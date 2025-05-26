@@ -10,4 +10,5 @@ edge_tts
 pygame
 pyaudio
 pandas
+seaborn
 sounddevice
