@@ -28,7 +28,7 @@ var/
 debug.log
 pip-log.txt
 pip-delete-this-directory.txt
-
+.env
 # Unit test / coverage reports
 htmlcov/
 .tox/

@@ -4,7 +4,7 @@ Gemini API setup and response logic for Think-Bot
 import google.generativeai as genai
 from memory_module import conversation_history, recent_observations, MAX_OBSERVATIONS, save_memory, search_memory
 
-GEMINI_API_KEY = "AIzaSyCES_W78pL1FeS0hMT4PDtwYoNbQkFHqCI"  # Replace with your actual Gemini API key
+GEMINI_API_KEY = "AIzaSyAUkA_iN8H7_f4EGVPQiLCA151d1olpdHc"  # Replace with your actual Gemini API key
 genai.configure(api_key=GEMINI_API_KEY)
 gemini = genai.GenerativeModel("gemini-1.5-flash")
 
