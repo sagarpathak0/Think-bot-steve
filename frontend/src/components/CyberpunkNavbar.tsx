@@ -21,6 +21,7 @@ export default function CyberpunkNavbar() {
     <nav className="w-full flex items-center justify-between px-6 py-3 neon-border-b holo shadow-lg" style={{background: "rgba(10,0,26,0.92)", zIndex: 20, position: 'fixed', top: 0, left: 0}}>
       <div className="flex items-center gap-4">
         <a href="/" className="text-xl font-bold glitch text-neon-pink">STEVE</a>
+        {isLoggedIn && <a href="/dashboard" className="nav-link">Dashboard</a>}
         <a href="/chat" className="nav-link">Chat</a>
         <a href="/stats" className="nav-link">Stats</a>
       </div>

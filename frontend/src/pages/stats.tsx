@@ -29,7 +29,7 @@ export default function StatsPage() {
       router.replace("/login");
       return;
     }
-    fetch({BASE_URL} + "/stats", {
+    fetch(`${BASE_URL}/stats`, {
       headers: { "Authorization": `Bearer ${token}` }
     })
       .then((res) => {

@@ -1,9 +1,29 @@
+
 # SteveRLBot (Think-Bot)
 
 SteveRLBot is a modular, voice-activated AI assistant and reinforcement learning (RL) agent. It combines computer vision, conversational AI, memory, multilingual support, and a DQN-based RL agent in a grid world. The codebase is organized for easy extension and maintenance.
 
+
+---
+## Cyberpunk Theme
+
+The dashboard and all web UI use a custom **cyberpunk/neon** theme with:
+- Futuristic neon colors (blue, pink, purple, green)
+- Glitch and HUD effects
+- Pixel/monospace fonts
+- Animated backgrounds and console-style layouts
+
+For a visual preview, see the `frontend/src/styles/globals.css` and the dashboard page. (Add screenshots here if desired.)
+
+---
+
+
 ## Features
 
+- **Web Dashboard**: Modern, multi-section dashboard (Astra/console style) for stats, chat, device control, and more.
+- **User Authentication**: Registration/login with email OTP, JWT-secured endpoints, and PostgreSQL user storage.
+- **Device/Robot Control**: Control robot movement (forward, back, left, right, stop) from the dashboard or API.
+- **Stats & Memory**: Per-user stats, mood, and conversation history, all stored in PostgreSQL.
 - **Computer Vision**: Face detection, object detection (YOLOv5), and OCR (Tesseract) via webcam.
 - **Conversational AI**: Uses Gemini AI for context-aware responses.
 - **Speech Recognition**: Wake word detection ("Steve") and command recognition.
@@ -65,24 +85,177 @@ The project uses a modular architecture with the following components:
 - PyTorch (for vision capabilities)
 - python-dotenv
 
+---
+## Environment Variables
+
+All secrets and configuration are loaded from `.env` files. **Never commit secrets to git.**
+
+### Backend (`.env` in project root)
+```
+PGDATABASE=thinkBot
+PGUSER=avnadmin
+PGPASSWORD=...           # Your PostgreSQL password
+PGHOST=...               # Your PostgreSQL host
+PGPORT=...               # Your PostgreSQL port
+GEMINI_API_KEY=...       # Google Gemini API key
+EMAIL=...                # Email address for OTP
+GOOGLE_CLIENT_ID=...     # Gmail OAuth2 client ID
+GOOGLE_CLIENT_SECRET=... # Gmail OAuth2 client secret
+GOOGLE_REFRESH_TOKEN=... # Gmail OAuth2 refresh token
+JWT_SECRET=...           # Secret for JWT signing
+```
+
+### Frontend (`frontend/.env`)
+```
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+```
+
+---
+
+
 ## Quick Start
 
-1. Create a `.env` file with your Gemini API key
-2. Set up hardware components (webcam, ultrasonic sensor)
-3. Run `python -m bot_core.main` for the main assistant
-4. Run `python -m RL.main_loop` for the RL agent
+1. Create a `.env` file with all required secrets (see below)
+2. Set up hardware components (webcam, ultrasonic sensor, robot, etc.)
+3. Start the backend API: `python -m bot_core.api_server`
+4. Start the frontend: `cd frontend && npm install && npm run dev`
+5. Run `python -m bot_core.main` for the main assistant (optional)
+6. Run `python -m RL.main_loop` for the RL agent (optional)
+
+---
+## Step-by-Step Setup Guide
+
+### Backend (API Server)
+
+1. **Create and activate a virtual environment (recommended):**
+   ```powershell
+   python -m venv myenv
+   .\myenv\Scripts\Activate.ps1
+   ```
+2. **Upgrade pip (optional):**
+   ```powershell
+   pip install --upgrade pip
+   ```
+3. **Install Python dependencies:**
+   ```powershell
+   pip install -r requirements.txt
+   ```
+4. **Configure environment variables:**
+   - Copy `.env.example` to `.env` and fill in all secrets (see above).
+5. **Run the backend API server:**
+   ```powershell
+   python -m bot_core.api_server
+   ```
+6. **(Optional) Run tests:**
+   ```powershell
+   python test.py
+   ```
+
+### Frontend (Cyberpunk Dashboard)
+
+1. **Install Node.js (v18+ recommended)**
+2. **Install dependencies:**
+   ```powershell
+   cd frontend
+   npm install
+   ```
+3. **Configure environment variables:**
+   - Create `frontend/.env` with:
+     ```
+     NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+     ```
+4. **Run the frontend:**
+   ```powershell
+   npm run dev
+   ```
+
+### Deployment
+
+- **Local:** Run backend and frontend as above.
+- **Production:**
+  - Use a production WSGI server (e.g., gunicorn) for backend
+  - Use `npm run build && npm start` for frontend
+  - Set all environment variables securely
+  - (Optional) Use Docker for containerized deployment
+
+---
+
 
 ## How to Interact
-- Type commands at the prompt and press Enter
-- Special commands:
-  - `tell me a joke` - Steve will tell you a joke
-  - `what time is it` - Steve will tell you the current time
-  - `distance` - Check the current distance from the ultrasonic sensor
-  - `quit` - Exit the program
+
+- **Web Dashboard**: Visit `http://localhost:3000/dashboard` after login for stats, chat, and device control.
+- **API**: See `API_DOCS.txt` for all endpoints, input/output, and authentication details.
+- **CLI**: Type commands at the prompt and press Enter (see above for special commands).
+
+---
+## API Reference (Summary)
+
+See `API_DOCS.txt` for full details. Here are the main endpoints:
+
+| Method | Endpoint     | Auth | Purpose                                 |
+|--------|--------------|------|-----------------------------------------|
+| POST   | /send_otp    | No   | Send OTP to user email                  |
+| POST   | /verify_otp  | No   | Verify OTP for email                    |
+| POST   | /register    | No   | Register new user (after OTP)           |
+| POST   | /login       | No   | User login, returns JWT                 |
+| POST   | /verify      | No   | Mark email as verified (optional)       |
+| POST   | /chat        | Yes  | Send chat message, get bot reply        |
+| GET    | /memory      | Yes  | Get recent conversation, summary, objs  |
+| GET    | /stats       | Yes  | Get today's stats (summary, mood, etc.) |
+| POST   | /control     | Yes  | Control robot/devices (move, etc)       |
+
+**All endpoints return JSON. Auth endpoints require JWT in the Authorization header.**
+
+---
+
 
 ## Notes
 - All commands should be run from the project root
 - See `setup_commands.txt` for a full list of setup instructions
+- All API endpoints and secrets are now loaded from `.env` (never hardcoded)
+- Git history has been cleaned of secrets and is safe for GitHub
+- Dashboard and stats pages now use a modern Astra (space/console) theme
+- Device/robot control is available from the dashboard and via API
 
 ---
-This README is up to date as of June 1, 2025.
+## Troubleshooting & FAQ
+
+- **CORS errors:** Ensure backend is running and CORS is enabled for frontend origin.
+- **DB connection issues:** Check PostgreSQL credentials and network/firewall settings.
+- **Email/OTP not sending:** Verify Gmail OAuth2 credentials and refresh token.
+- **Frontend can't reach backend:** Check `NEXT_PUBLIC_API_BASE_URL` and backend port.
+- **Secrets in git:** Use `git filter-repo` to scrub history and always use `.env`.
+
+---
+## Security Practices
+
+- All passwords are hashed before storage.
+- JWT is used for all user-specific endpoints.
+- All secrets are loaded from `.env` and never hardcoded.
+- CORS is enabled and restricted to frontend origin.
+- Git history has been scrubbed of secrets.
+
+---
+## License
+
+Specify your license here (MIT, GPL, or "All rights reserved").
+
+---
+## Credits & Acknowledgments
+
+- Cyberpunk UI inspired by open source neon/cyberpunk design systems.
+- Uses Next.js, React, Tailwind CSS, Flask, PyTorch, Google Gemini, and more.
+
+---
+
+---
+---
+## Recent Changes (as of June 5, 2025)
+
+- **Security:** All secrets moved to `.env`, JWT for all user endpoints, PostgreSQL for all user/chat data.
+- **Frontend:** Modern dashboard layout, Astra theme, device control panel, and improved navigation.
+- **Backend:** New `/control` API for robot/device commands, all endpoints CORS and JWT protected.
+- **Docs:** See `API_DOCS.txt` for all API endpoints, input/output, and authentication.
+
+This README is up to date as of June 5, 2025.
+

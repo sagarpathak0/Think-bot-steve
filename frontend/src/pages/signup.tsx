@@ -23,7 +23,7 @@ export default function SignupPage() {
     setInfo("");
     setLoading(true);
     try {
-      const res = await fetch({BASE_URL} + "/send_otp", {
+      const res = await fetch(`${BASE_URL}/send_otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email })
@@ -48,7 +48,7 @@ export default function SignupPage() {
     setInfo("");
     setLoading(true);
     try {
-      const res = await fetch({BASE_URL} + "/verify_otp", {
+      const res = await fetch(`${BASE_URL}/verify_otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp })
@@ -73,7 +73,7 @@ export default function SignupPage() {
     setSuccess(false);
     setLoading(true);
     try {
-      const res = await fetch({BASE_URL} + "/register", {
+      const res = await fetch(`${BASE_URL}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, username, password })

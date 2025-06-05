@@ -1,0 +1,50 @@
+# API Documentation
+
+## 1. /send_otp [POST]
+- **Purpose:** Send OTP to user email for registration verification.
+- **Input:** `{ "email": string }`
+- **Output:** `{ success: boolean, message: string }` or `{ error: string }`
+
+## 2. /verify_otp [POST]
+- **Purpose:** Verify OTP for email.
+- **Input:** `{ "email": string, "otp": string }`
+- **Output:** `{ success: boolean, message: string }` or `{ error: string }`
+
+## 3. /register [POST]
+- **Purpose:** Register a new user after OTP verification.
+- **Input:** `{ "username": string, "email": string, "password": string }`
+- **Output:** `{ success: boolean, user_id: int, message: string }` or `{ error: string }`
+
+## 4. /login [POST]
+- **Purpose:** User login, returns JWT.
+- **Input:** `{ "username": string, "password": string }`
+- **Output:** `{ token: string }` or `{ error: string }`
+
+## 5. /verify [POST]
+- **Purpose:** Mark email as verified (optional, for email link verification).
+- **Input:** `{ "email": string }`
+- **Output:** `{ success: boolean, message: string }` or `{ error: string }`
+
+## 6. /chat [POST]
+- **Purpose:** Send a chat message, get bot reply. (JWT required)
+- **Input:** `{ "message": string }` (Header: `Authorization: Bearer <token>`)
+- **Output:** `{ reply: string }` or `{ error: string }`
+
+## 7. /memory [GET]
+- **Purpose:** Get recent conversation, summary, and objects for user. (JWT required)
+- **Input:** Header: `Authorization: Bearer <token>`
+- **Output:** `{ conversation: [...], summary: string, objects: object }` or `{ error: string }`
+
+## 8. /stats [GET]
+- **Purpose:** Get today's stats (summary, mood, message count, mood timeline). (JWT required)
+- **Input:** Header: `Authorization: Bearer <token>`
+- **Output:** `{ summary: string, mood_timeline: [...], avg_mood: number, count: number }` or `{ error: string }`
+
+## 9. /control [POST]
+- **Purpose:** Control robot/devices (move, etc). (JWT required)
+- **Input:** `{ "action": "move", "direction": "forward"|"backward"|"left"|"right"|"stop" }` (Header: `Authorization: Bearer <token>`)
+- **Output:** `{ success: boolean, result?: string, error?: string }`
+
+---
+**All endpoints return JSON.**
+**Endpoints requiring authentication expect JWT in the Authorization header.**

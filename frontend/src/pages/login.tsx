@@ -14,7 +14,7 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     try {
-      const res = await fetch({BASE_URL} + "/login", {
+      const res = await fetch(`${BASE_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password })
@@ -22,7 +22,7 @@ export default function LoginPage() {
       const data = await res.json();
       if (res.ok && data.token) {
         localStorage.setItem("jwt_token", data.token);
-        router.push("/chat");
+        router.push("/dashboard");
       } else {
         setError(data.error || "Login failed");
       }
