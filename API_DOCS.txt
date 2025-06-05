@@ -51,6 +51,16 @@
 - **Input:** Header: `Authorization: Bearer <token>`
 - **Output:** `{ username: string, email: string }` or `{ error: string }`
 
+## Dashboard-Related APIs
+
+- **/me [GET]**: Returns the current user's username and email. Requires JWT in Authorization header.
+  - Output: `{ username: string, email: string }` or `{ error: string }`
+- **/system_stats [GET]**: Returns system CPU, RAM, and network usage. No authentication required.
+  - Output: `{ cpu: number, ram: number, net: { sent: number, recv: number } }` or `{ error: string }`
+- **/stats [GET]**: Returns today's stats (summary, mood, message count, mood timeline) for the user. Requires JWT.
+- **/memory [GET]**: Returns recent conversation, summary, and objects for the user. Requires JWT.
+- **/control [POST]**: Control robot/devices (move, etc). Requires JWT.
+
 ---
 **All endpoints return JSON.**
 **Endpoints requiring authentication expect JWT in the Authorization header.**

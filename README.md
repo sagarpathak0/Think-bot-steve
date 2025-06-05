@@ -1,13 +1,13 @@
-
 # SteveRLBot (Think-Bot)
 
 SteveRLBot is a modular, voice-activated AI assistant and reinforcement learning (RL) agent. It combines computer vision, conversational AI, memory, multilingual support, and a DQN-based RL agent in a grid world. The codebase is organized for easy extension and maintenance.
 
-
 ---
+
 ## Cyberpunk Theme
 
 The dashboard and all web UI use a custom **cyberpunk/neon** theme with:
+
 - Futuristic neon colors (blue, pink, purple, green)
 - Glitch and HUD effects
 - Pixel/monospace fonts
@@ -16,7 +16,6 @@ The dashboard and all web UI use a custom **cyberpunk/neon** theme with:
 For a visual preview, see the `frontend/src/styles/globals.css` and the dashboard page. (Add screenshots here if desired.)
 
 ---
-
 
 ## Features
 
@@ -86,11 +85,13 @@ The project uses a modular architecture with the following components:
 - python-dotenv
 
 ---
+
 ## Environment Variables
 
 All secrets and configuration are loaded from `.env` files. **Never commit secrets to git.**
 
 ### Backend (`.env` in project root)
+
 ```
 PGDATABASE=thinkBot
 PGUSER=avnadmin
@@ -106,12 +107,12 @@ JWT_SECRET=...           # Secret for JWT signing
 ```
 
 ### Frontend (`frontend/.env`)
+
 ```
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 ```
 
 ---
-
 
 ## Quick Start
 
@@ -123,6 +124,7 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 6. Run `python -m RL.main_loop` for the RL agent (optional)
 
 ---
+
 ## Step-by-Step Setup Guide
 
 ### Backend (API Server)
@@ -180,37 +182,51 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 
 ---
 
+## Dashboard Overview
+
+The Cyberpunk Dashboard provides a modern, neon-themed interface for interacting with SteveRLBot. After logging in, users can:
+
+- View their username and email in the sidebar profile card (fetched from `/me` API)
+- See a live digital clock and system resource monitor (CPU, RAM, network usage from `/system_stats`)
+- Get AI tips/news and use a quick command bar (demo)
+- View system status, detected objects, and recent conversation
+- Use quick actions (clear memory, export chat, toggle theme)
+- Manually control the robot/device (via `/control` API)
+
+**Access:** Visit `http://localhost:3000/dashboard` after login.
 
 ## How to Interact
 
-- **Web Dashboard**: Visit `http://localhost:3000/dashboard` after login for stats, chat, and device control.
+- **Web Dashboard**: Modern UI for stats, chat, device control, and more.
 - **API**: See `API_DOCS.txt` for all endpoints, input/output, and authentication details.
 - **CLI**: Type commands at the prompt and press Enter (see above for special commands).
 
 ---
+
 ## API Reference (Summary)
 
 See `API_DOCS.txt` for full details. Here are the main endpoints:
 
-| Method | Endpoint     | Auth | Purpose                                 |
-|--------|--------------|------|-----------------------------------------|
-| POST   | /send_otp    | No   | Send OTP to user email                  |
-| POST   | /verify_otp  | No   | Verify OTP for email                    |
-| POST   | /register    | No   | Register new user (after OTP)           |
-| POST   | /login       | No   | User login, returns JWT                 |
-| POST   | /verify      | No   | Mark email as verified (optional)       |
-| POST   | /chat        | Yes  | Send chat message, get bot reply        |
-| GET    | /memory      | Yes  | Get recent conversation, summary, objs  |
-| GET    | /stats       | Yes  | Get today's stats (summary, mood, etc.) |
-| POST   | /control     | Yes  | Control robot/devices (move, etc)       |
-| GET    | /me          | Yes  | Get current user's username and email   |
+| Method | Endpoint      | Auth | Purpose                                 |
+| ------ | ------------- | ---- | --------------------------------------- |
+| POST   | /send_otp     | No   | Send OTP to user email                  |
+| POST   | /verify_otp   | No   | Verify OTP for email                    |
+| POST   | /register     | No   | Register new user (after OTP)           |
+| POST   | /login        | No   | User login, returns JWT                 |
+| POST   | /verify       | No   | Mark email as verified (optional)       |
+| POST   | /chat         | Yes  | Send chat message, get bot reply        |
+| GET    | /memory       | Yes  | Get recent conversation, summary, objs  |
+| GET    | /stats        | Yes  | Get today's stats (summary, mood, etc.) |
+| POST   | /control      | Yes  | Control robot/devices (move, etc)       |
+| GET    | /system_stats | No   | Get system CPU, RAM, and network usage  |
+| GET    | /me           | Yes  | Get current user's username and email   |
 
 **All endpoints return JSON. Auth endpoints require JWT in the Authorization header.**
 
 ---
 
-
 ## Notes
+
 - All commands should be run from the project root
 - See `setup_commands.txt` for a full list of setup instructions
 - All API endpoints and secrets are now loaded from `.env` (never hardcoded)
@@ -219,6 +235,7 @@ See `API_DOCS.txt` for full details. Here are the main endpoints:
 - Device/robot control is available from the dashboard and via API
 
 ---
+
 ## Troubleshooting & FAQ
 
 - **CORS errors:** Ensure backend is running and CORS is enabled for frontend origin.
@@ -228,6 +245,7 @@ See `API_DOCS.txt` for full details. Here are the main endpoints:
 - **Secrets in git:** Use `git filter-repo` to scrub history and always use `.env`.
 
 ---
+
 ## Security Practices
 
 - All passwords are hashed before storage.
@@ -237,11 +255,13 @@ See `API_DOCS.txt` for full details. Here are the main endpoints:
 - Git history has been scrubbed of secrets.
 
 ---
+
 ## License
 
 Specify your license here (MIT, GPL, or "All rights reserved").
 
 ---
+
 ## Credits & Acknowledgments
 
 - Cyberpunk UI inspired by open source neon/cyberpunk design systems.
@@ -250,7 +270,9 @@ Specify your license here (MIT, GPL, or "All rights reserved").
 ---
 
 ---
+
 ---
+
 ## Recent Changes (as of June 5, 2025)
 
 - **Security:** All secrets moved to `.env`, JWT for all user endpoints, PostgreSQL for all user/chat data.
@@ -259,4 +281,3 @@ Specify your license here (MIT, GPL, or "All rights reserved").
 - **Docs:** See `API_DOCS.txt` for all API endpoints, input/output, and authentication.
 
 This README is up to date as of June 5, 2025.
-
