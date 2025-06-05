@@ -13,11 +13,11 @@ import base64
 # Helper to get a new DB connection each time
 def get_db_conn():
     return psycopg2.connect(
-        dbname=os.getenv("PGDATABASE", "thinkBot"),
-        user=os.getenv("PGUSER", "avnadmin"),
-        password=os.getenv("PGPASSWORD", "REMOVED"),
-        host=os.getenv("PGHOST", "pg-rabbitanimated-postgres-animate28.i.aivencloud.com"),
-        port=os.getenv("PGPORT", 13249)
+        dbname=os.getenv("PGDATABASE"),
+        user=os.getenv("PGUSER"),
+        password=os.getenv("PGPASSWORD"),
+        host=os.getenv("PGHOST"),
+        port=os.getenv("PGPORT")
     )
 
 
