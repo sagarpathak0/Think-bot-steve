@@ -203,6 +203,7 @@ See `API_DOCS.txt` for full details. Here are the main endpoints:
 | GET    | /memory      | Yes  | Get recent conversation, summary, objs  |
 | GET    | /stats       | Yes  | Get today's stats (summary, mood, etc.) |
 | POST   | /control     | Yes  | Control robot/devices (move, etc)       |
+| GET    | /me          | Yes  | Get current user's username and email   |
 
 **All endpoints return JSON. Auth endpoints require JWT in the Authorization header.**
 

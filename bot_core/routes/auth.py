@@ -6,6 +6,20 @@ import bcrypt, jwt, datetime as dt
 import random
 
 def register_routes(app):
+    @app.route("/me", methods=["GET"])
+    def get_me():
+        from bot_core.utils.jwt_utils import get_user_id_from_token
+        user_id = get_user_id_from_token()
+        if not user_id:
+            return jsonify({"error": "Unauthorized"}), 401
+        with get_db_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT username, email FROM users WHERE id=%s", (user_id,))
+                row = cur.fetchone()
+                if not row:
+                    return jsonify({"error": "User not found"}), 404
+                username, email = row
+        return jsonify({"username": username, "email": email})
     @app.route("/send_otp", methods=["POST"])
     def send_otp():
         data = request.get_json()

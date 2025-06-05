@@ -1,3 +1,4 @@
+
 # API Documentation
 
 ## 1. /send_otp [POST]
@@ -44,6 +45,11 @@
 - **Purpose:** Control robot/devices (move, etc). (JWT required)
 - **Input:** `{ "action": "move", "direction": "forward"|"backward"|"left"|"right"|"stop" }` (Header: `Authorization: Bearer <token>`)
 - **Output:** `{ success: boolean, result?: string, error?: string }`
+
+## 10. /me [GET]
+- **Purpose:** Get the current user's username and email (JWT required)
+- **Input:** Header: `Authorization: Bearer <token>`
+- **Output:** `{ username: string, email: string }` or `{ error: string }`
 
 ---
 **All endpoints return JSON.**
