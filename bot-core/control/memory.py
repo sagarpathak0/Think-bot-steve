@@ -2,10 +2,12 @@ import json
 from datetime import datetime
 
 class Memory:
-    def __init__(self, filename="memory.json"):
+    def __init__(self, filename="bot_memory.json"):
         self.filename = filename
         self.memory = self.load_memory()
-        
+        if "summary" not in self.memory:
+            self.memory["summary"] = ""
+
     def load_memory(self):
         """Load memory from file"""
         try:
@@ -77,6 +79,24 @@ class Memory:
                 })
                 
         return results
+    
+    def update_summary(self, ai):
+        """Update the running summary using Gemini"""
+        # Use all conversation history for summarization
+        history = self.memory["conversation_history"]
+        if not history:
+            return
+        # Create a text block of the conversation
+        convo_text = "\n".join([f"{c['speaker']}: {c['message']}" for c in history])
+        prompt = (
+            "Summarize the following conversation between a user and an AI assistant. "
+            "Keep the summary concise but include all important facts, names, and context. "
+            "This summary will be used as context for future conversations.\n\n"
+            f"{convo_text}\n\nSummary:"
+        )
+        summary = ai.ask(prompt)
+        self.memory["summary"] = summary
+        self.save_memory()
 
 # Example usage
 if __name__ == "__main__":

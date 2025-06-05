@@ -54,26 +54,37 @@ class GeminiClient:
         print("Could not establish connection to Gemini API after multiple attempts.")
         print("Bot will continue without Gemini AI support.")
             
-    def ask(self, question, context=None):
-        """Ask Gemini a question with optional context"""
+    def ask(self, question, context=None, detected_objects=None):
+        """Ask Gemini a question with optional context and detected objects. Only mention objects if actually detected."""
         # If no model (API key failed), return fallback response
         if not hasattr(self, 'model'):
             return "I'm sorry, I can't connect to my AI services right now."
-            
         try:
-            prompt = question
-            if context:
-                curious_prompt = (
-                    "You are a curious, friendly robot. "
-                    "When you answer, always sound excited to learn and discover new things. "
-                    f"Context: {context}\n\n"
-                    f"Question: {question}\n"
-                    "Respond in a way that shows curiosity and invites further interaction."
-                )
-                response = self.chat.send_message(curious_prompt)
+            # Compose a system prompt that only allows object mentions if detected_objects is not empty
+            if detected_objects and len(detected_objects) > 0:
+                objects_str = ', '.join(detected_objects)
+                vision_line = f"You currently see these objects: {objects_str}. You may ask about them."
             else:
-                response = self.chat.send_message(prompt)
-                
+                vision_line = "You do not see any objects right now. Do not mention seeing or detecting anything unless the user describes it."
+
+            if context:
+                prompt = (
+                    "You are Steve, a friendly robot. "
+                    + vision_line + " "
+                    "Never say you can't see or that you are just a language model. "
+                    "Respond in a short, friendly, conversational way (1-2 sentences, not a paragraph).\n"
+                    f"Context: {context}\n"
+                    f"Question: {question}\n"
+                )
+            else:
+                prompt = (
+                    "You are Steve, a friendly robot. "
+                    + vision_line + " "
+                    "Never say you can't see or that you are just a language model. "
+                    "Respond in a short, friendly, conversational way (1-2 sentences, not a paragraph).\n"
+                    f"Question: {question}\n"
+                )
+            response = self.chat.send_message(prompt)
             return response.text
         except Exception as e:
             return f"I'm sorry, I encountered an error: {str(e)}"
@@ -87,3 +98,17 @@ class GeminiClient:
                 ])
             except Exception:
                 pass  # Silently fail if API is not working
+    
+    def process_user_input(self, text_input):
+        """Process the user input and get a response from Gemini"""
+        # Here, self.memory.memory is assumed to be a dict-like object
+        summary = self.memory.memory.get("summary", "")
+        context = f"Conversation summary so far: {summary}\n"
+        # Add the new user input
+        context += f"User: {text_input}\n"
+        response = self.ask(text_input, context)
+        
+        # Optionally, update the memory with the new user input and response
+        self.memory.memory["summary"] = summary + f"User: {text_input}\nAI: {response}\n"
+        
+        return response

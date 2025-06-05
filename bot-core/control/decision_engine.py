@@ -16,6 +16,42 @@ from skills.basic_skills import Skills
 from ai.gemini_client import GeminiClient
 
 class DecisionEngine:
+    def set_webcam_stream(self, webcam_stream):
+        """Attach a WebcamStream instance for vision polling"""
+        self.webcam_stream = webcam_stream
+        self.last_seen_objects = set()
+        self.last_asked_objects = set()
+
+    def poll_vision(self):
+        """Poll the webcam for new object/person detections and act curiously, and update summary after vision chat"""
+        if not hasattr(self, 'webcam_stream') or not self.webcam_stream.is_running:
+            return
+        ret, _, detected_labels = self.webcam_stream.read_frame()
+        if not ret or not detected_labels:
+            return
+        # Only consider unique objects in this frame
+        current_objects = set(detected_labels)
+        new_objects = current_objects - self.last_seen_objects
+        for obj in new_objects:
+            # Remember the object
+            self.memory.remember_object(obj)
+            # Only ask about truly new objects (not already asked in this session)
+            if obj not in self.last_asked_objects:
+                question = f"I see a {obj}! Can you tell me more about it?"
+                # Add to conversation and memory
+                self.memory.add_conversation("bot", question)
+                self.memory.save_memory()
+                # Use Gemini to generate a curious follow-up (optional, can just use question)
+                context = self.memory.memory.get("summary", "")
+                ai_response = self.ai.ask(question, context)
+                ai_response = self.personality.add_enthusiasm(ai_response)
+                self.memory.add_conversation("bot", ai_response)
+                self.memory.save_memory()
+                self.speech.speak(ai_response)
+                self.last_asked_objects.add(obj)
+                # Update the running summary after vision chat
+                self.memory.update_summary(self.ai)
+        self.last_seen_objects = current_objects
     def __init__(self):
         self.speech = SpeechEngine()
         self.memory = Memory("bot_memory.json")
@@ -80,8 +116,8 @@ class DecisionEngine:
         # Save response to memory
         self.memory.add_conversation("bot", response)
         self.memory.save_memory()  # Save after conversation is complete
-        
-        # Always respond in English
+        # Update the summary after each chat
+        self.memory.update_summary(self.ai)
         self.speech.speak(response)
         return response
             
@@ -89,6 +125,9 @@ class DecisionEngine:
         """Main run loop for the decision engine"""
         while self.is_running:
             self.process_sensor_data()
+            # Poll vision for new objects/persons
+            if hasattr(self, 'webcam_stream'):
+                self.poll_vision()
             time.sleep(0.5)
             
     def stop(self):

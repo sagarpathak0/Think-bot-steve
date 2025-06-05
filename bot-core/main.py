@@ -43,58 +43,45 @@ def main():
     ultrasonic_thread = threading.Thread(target=start_ultrasonic_server, daemon=True)
     ultrasonic_thread.start()
     
-    # Start decision engine
-    engine = DecisionEngine()
-    decision_thread = threading.Thread(target=engine.run, daemon=True)
-    decision_thread.start()
-    
     # Start webcam stream
     webcam = WebcamStream()
     webcam_thread = None
-    
+
+    # Start decision engine
+    engine = DecisionEngine()
+    # Attach webcam stream to decision engine for vision polling
+    engine.set_webcam_stream(webcam)
+    decision_thread = threading.Thread(target=engine.run, daemon=True)
+    decision_thread.start()
+
     def webcam_loop():
-        """Process webcam frames in a separate thread"""
+        """Process webcam frames in a separate thread (display only)"""
         running = True
         while running:
             try:
                 if not webcam.is_running:
                     break
-                    
-                ret, frame = webcam.read_frame()
+                ret, frame, _ = webcam.read_frame()
                 if not ret:
-                    time.sleep(0.1)  # Add a small delay to prevent CPU spinning
+                    time.sleep(0.1)
                     continue
-                    
                 # Get current distance from ultrasonic sensor
                 current_distance = distance_data.get("distance")
-                
                 # Add distance display to frame
                 if current_distance is not None:
-                    # Draw background for text
                     cv2.rectangle(frame, (10, 10), (250, 70), (0, 0, 0), -1)
-                    
-                    # Display distance value
-                    cv2.putText(frame, f"Distance: {current_distance} cm", 
-                                (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.8, 
-                                (255, 255, 255), 2)
-                    
-                    # Add color indicator based on distance
-                    color = (0, 255, 0)  # Green for safe distance
+                    cv2.putText(frame, f"Distance: {current_distance} cm", (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+                    color = (0, 255, 0)
                     if current_distance < 30:
-                        color = (0, 0, 255)  # Red for close objects
+                        color = (0, 0, 255)
                     elif current_distance < 100:
-                        color = (0, 255, 255)  # Yellow for medium distance
-                        
-                    # Draw bar showing distance visually
+                        color = (0, 255, 255)
                     bar_length = int(min(current_distance * 2, 400))
                     cv2.rectangle(frame, (20, 50), (20 + bar_length, 60), color, -1)
-                
-                # Show the frame
                 cv2.imshow("Bot Vision", frame)
                 key = cv2.waitKey(1) & 0xFF
                 if key == ord('q'):
                     running = False
-                    
             except Exception as e:
                 print(f"Webcam error: {e}")
                 time.sleep(0.1)
