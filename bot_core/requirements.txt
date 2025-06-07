@@ -22,3 +22,4 @@ seaborn
 sounddevice
 ultralytics
 langdetect
+flask_cors
