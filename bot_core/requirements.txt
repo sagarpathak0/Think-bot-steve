@@ -24,3 +24,4 @@ ultralytics
 langdetect
 flask_cors
 PyJWT
+bcrypt
