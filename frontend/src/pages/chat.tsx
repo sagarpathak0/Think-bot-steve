@@ -58,53 +58,6 @@ function LiveClock() {
     </div>
   );
 }
-function SystemResourceMonitor() {
-  const [resources, setResources] = useState<{cpu:number,ram:number,net?:{sent:number,recv:number}}|null>(null);
-  const [error, setError] = useState<string|null>(null);
-  useEffect(() => {
-    let mounted = true;
-    async function fetchStats() {
-      try {
-        const res = await fetch(`${BASE_URL}/system_stats`);
-        if (!res.ok) throw new Error('Failed to fetch system stats');
-        const data = await res.json();
-        if (mounted) setResources({ cpu: data.cpu, ram: data.ram, net: data.net });
-      } catch (e: any) {
-        if (mounted) setError('System stats unavailable');
-      }
-    }
-    fetchStats();
-    const timer = setInterval(fetchStats, 2000);
-    return () => { mounted = false; clearInterval(timer); };
-  }, []);
-  if (error) return <div className="mb-2 text-neon-pink text-xs">{error}</div>;
-  if (!resources) return null;
-  const {cpu, ram, net} = resources;
-  return (
-    <div className="mb-2">
-      <div className="font-bold text-neon-blue mb-1">System Resources</div>
-      <div className="flex items-center gap-2 text-xs mb-1">
-        CPU
-        <div className="flex-1 min-w-[60px] h-2 bg-gray-800 rounded overflow-hidden">
-          <div className="h-2 rounded bg-neon-pink" style={{width: `${Math.max(2, Math.round(cpu))}%`, minWidth: 2}}></div>
-        </div>
-        <span className="text-neon-pink">{Math.round(cpu)}%</span>
-      </div>
-      <div className="flex items-center gap-2 text-xs mb-1">
-        RAM
-        <div className="flex-1 min-w-[60px] h-2 bg-gray-800 rounded overflow-hidden">
-          <div className="h-2 rounded bg-neon-blue" style={{width: `${Math.max(2, Math.round(ram))}%`, minWidth: 2}}></div>
-        </div>
-        <span className="text-neon-blue">{Math.round(ram)}%</span>
-      </div>
-      {net && (
-        <div className="flex items-center gap-2 text-xs mb-1">
-          NET <span className="text-neon-blue">{(net.recv/1024).toFixed(1)} KB/s ↓</span> <span className="text-neon-pink">{(net.sent/1024).toFixed(1)} KB/s ↑</span>
-        </div>
-      )}
-    </div>
-  );
-}
 function AITipsWidget() {
   const [idx, setIdx] = useState(0);
   useEffect(() => {
@@ -120,11 +73,6 @@ function AITipsWidget() {
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-type MoodPoint = {
-  timestamp: string;
-  speaker: string;
-  mood: number;
-};
 
 type Message = {
   timestamp: string;
@@ -171,7 +119,7 @@ const ChatPage = () => {
       }
       const d = await res.json();
       setData(d);
-    } catch (e) {
+    } catch {
       setError("Could not load bot data.");
     }
     setLoading(false);
@@ -246,14 +194,14 @@ const ChatPage = () => {
       } else if (result.error) {
         setError(result.error);
       }
-    } catch (e) {
+    } catch {
       setError("Could not send message.");
     }
     setSending(false);
   };
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden transition-colors duration-500" style={{background: "linear-gradient(135deg, #0a001a 60%, #1a0033 100%)", color: "#e0e0ff", fontFamily: "'Share Tech Mono', 'VT323', 'Fira Mono', monospace"}}>
+    <div className="min-h-screen flex flex-col relative overflow-hidden transition-colors duration-500" style={{background: "linear-gradient(135deg, #0a001a 60%, #1a0033 100%)", color: "#e0e0ff", fontFamily: "\'Share Tech Mono\', \'VT323\', \'Fira Mono\', monospace"}}>
       <CyberpunkNavbar />
       <div className="w-full mx-auto flex flex-col md:flex-row gap-8 px-0 md:px-4 mt-32 z-10" style={{maxWidth: '100vw'}}>
         {/* Info/Sidebar (30%) */}

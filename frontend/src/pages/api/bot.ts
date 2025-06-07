@@ -10,7 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const response = await fetch(`${BOT_API_URL}/memory`);
       const data = await response.json();
       res.status(200).json(data);
-    } catch (e) {
+    } catch {
       res.status(500).json({ error: "Could not connect to bot backend." });
     }
   } else if (req.method === "POST") {
@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
       const data = await response.json();
       res.status(200).json(data);
-    } catch (e) {
+    } catch {
       res.status(500).json({ error: "Could not connect to bot backend." });
     }
   } else {

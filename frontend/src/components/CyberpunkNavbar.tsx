@@ -1,6 +1,7 @@
 
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function CyberpunkNavbar() {
   const router = useRouter();
@@ -31,22 +32,22 @@ export default function CyberpunkNavbar() {
         minHeight: 64,
       }}>
       <div className="flex items-center gap-6">
-        <a href="/" className="text-2xl font-extrabold glitch text-neon-blue tracking-widest flex items-center gap-2">
-        <span className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-pink-500 flex items-center justify-center border-2 border-neon-blue shadow-lg mr-2">
-          <span className="bg-black rounded-full p-1.5 border-4 border-neon-blue flex items-center justify-center">
-            <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-              <circle cx="16" cy="16" r="12" fill="#0a001a"/>
-              <path d="M10 22v-1a4 4 0 014-4h4a4 4 0 014 4v1" stroke="#00f0ff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <circle cx="16" cy="14" r="3" fill="#ff00de"/>
-            </svg>
+        <Link href="/" className="text-2xl font-extrabold glitch text-neon-blue tracking-widest flex items-center gap-2">
+          <span className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-pink-500 flex items-center justify-center border-2 border-neon-blue shadow-lg mr-2">
+            <span className="bg-black rounded-full p-1.5 border-4 border-neon-blue flex items-center justify-center">
+              <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                <circle cx="16" cy="16" r="12" fill="#0a001a"/>
+                <path d="M10 22v-1a4 4 0 014-4h4a4 4 0 014 4v1" stroke="#00f0ff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="16" cy="14" r="3" fill="#ff00de"/>
+              </svg>
+            </span>
           </span>
-        </span>
-        STEVE <span className="text-neon-pink flicker">Think-Bot</span>
-        </a>
+          STEVE <span className="text-neon-pink flicker">Think-Bot</span>
+        </Link>
         <div className="hidden md:flex items-center gap-4 text-base font-mono">
-          {isLoggedIn && <a href="/dashboard" className="nav-link text-neon-blue hover:text-neon-pink transition">Dashboard</a>}
-          <a href="/chat" className="nav-link text-neon-blue hover:text-neon-pink transition">Chat</a>
-          <a href="/stats" className="nav-link text-neon-blue hover:text-neon-pink transition">Stats</a>
+          {isLoggedIn && <Link href="/dashboard" className="nav-link text-neon-blue hover:text-neon-pink transition">Dashboard</Link>}
+          <Link href="/chat" className="nav-link text-neon-blue hover:text-neon-pink transition">Chat</Link>
+          <Link href="/stats" className="nav-link text-neon-blue hover:text-neon-pink transition">Stats</Link>
         </div>
       </div>
       <div className="flex items-center gap-4">
@@ -54,8 +55,8 @@ export default function CyberpunkNavbar() {
           <button onClick={handleLogout} className="glitch-btn px-4 py-2 text-base animate-glow-btn">Logout</button>
         ) : (
           <div className="flex items-center gap-2">
-            <a href="/login" className="glitch-btn px-4 py-2 text-base animate-glow-btn">Login</a>
-            <a href="/signup" className="glitch-btn px-4 py-2 text-base animate-glow-btn">Sign Up</a>
+            <Link href="/login" className="glitch-btn px-4 py-2 text-base animate-glow-btn">Login</Link>
+            <Link href="/signup" className="glitch-btn px-4 py-2 text-base animate-glow-btn">Sign Up</Link>
           </div>
         )}
       </div>

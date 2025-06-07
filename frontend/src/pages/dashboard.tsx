@@ -62,7 +62,7 @@ function SystemResourceMonitor() {
         if (!res.ok) throw new Error('Failed to fetch system stats');
         const data = await res.json();
         if (mounted) setResources({ cpu: data.cpu, ram: data.ram, net: data.net });
-      } catch (e: any) {
+      } catch {
         if (mounted) setError('System stats unavailable');
       }
     }
@@ -164,7 +164,12 @@ function LiveStatusWidget({ status }: { status: string }) {
 }
 
 // Quick Actions Widget
-function QuickActions({ onClearMemory, onExportChat, onToggleTheme }: any) {
+interface QuickActionsProps {
+  onClearMemory: () => void;
+  onExportChat: () => void;
+  onToggleTheme: () => void;
+}
+function QuickActions({ onClearMemory, onExportChat, onToggleTheme }: QuickActionsProps) {
   return (
     <div className="flex flex-col gap-2 mt-4">
       <button className="glitch-btn px-4 py-2 text-sm" onClick={onClearMemory}>Clear Memory</button>
@@ -191,7 +196,7 @@ function ManualControlPanel() {
       });
       const data = await res.json();
       setStatus(data.success ? `Moved: ${direction}` : data.error || "Failed");
-    } catch (e) {
+    } catch {
       setStatus("Failed to send command");
     }
   };
@@ -215,8 +220,22 @@ function ManualControlPanel() {
 
 
 export default function Dashboard() {
-  const [stats, setStats] = useState<any>(null);
-  const [memory, setMemory] = useState<any>(null);
+  // --- Types for dashboard state ---
+  interface Stats {
+    avg_mood?: number;
+    count?: number;
+    summary?: string;
+  }
+  interface ConversationMessage {
+    speaker: 'user' | 'bot';
+    message: string;
+  }
+  interface Memory {
+    conversation: ConversationMessage[];
+    objects: Record<string, unknown[]>;
+  }
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [memory, setMemory] = useState<Memory | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [theme, setTheme] = useState<'cyberpunk' | 'dark'>("cyberpunk");
@@ -252,7 +271,7 @@ export default function Dashboard() {
   };
   const handleExportChat = () => {
     if (!memory || !memory.conversation) return;
-    const text = memory.conversation.map((msg: any) => `${msg.speaker === 'bot' ? 'Steve' : 'You'}: ${msg.message}`).join("\n");
+    const text = memory.conversation.map((msg: ConversationMessage) => `${msg.speaker === 'bot' ? 'Steve' : 'You'}: ${msg.message}`).join("\n");
     const blob = new Blob([text], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -273,7 +292,7 @@ export default function Dashboard() {
           ? "linear-gradient(135deg, #0a001a 60%, #1a0033 100%)"
           : "linear-gradient(135deg, #000 60%, #222 100%)",
         color: theme === 'cyberpunk' ? "#e0e0ff" : undefined,
-        fontFamily: "'Share Tech Mono', 'VT323', 'Fira Mono', monospace"
+        fontFamily: "\'Share Tech Mono\', \'VT323\', \'Fira Mono\', monospace"
       }}>
       {/* Animated SVG background for cyberpunk effect */}
       {theme === 'cyberpunk' && (
@@ -320,12 +339,12 @@ export default function Dashboard() {
           <AITipsWidget />
           <section>
             <h2 className="text-2xl font-bold mb-2">Welcome{memory && memory.conversation && memory.conversation.length > 0 ? `, ${memory.conversation[memory.conversation.length-1].speaker === 'user' ? 'User' : 'Steve'}` : ''}!</h2>
-            <div className="mb-2"><strong>Today's Summary:</strong> {stats?.summary || "No summary yet."}</div>
+            <div className="mb-2"><strong>Today&apos;s Summary:</strong> {stats?.summary || "No summary yet."}</div>
             <div className="mb-2"><strong>Mood:</strong> {typeof stats?.avg_mood === 'number' ? (stats.avg_mood > 0.1 ? "😊" : stats.avg_mood < -0.1 ? "😞" : "😐") : "-"} ({typeof stats?.avg_mood === 'number' ? stats.avg_mood.toFixed(2) : "-"})</div>
             <div className="mb-2"><strong>Messages Today:</strong> {typeof stats?.count === 'number' ? stats.count : "-"}</div>
             <div className="flex flex-col gap-2 mt-4">
               <Link href="/chat" className="glitch-btn text-xl px-8 py-4 animate-glow-btn">Start Chat</Link>
-              <Link href="/stats" className="glitch-btn text-lg px-6 py-2 animate-glow-btn">Today's Stats</Link>
+              <Link href="/stats" className="glitch-btn text-lg px-6 py-2 animate-glow-btn">Today&apos;s Stats</Link>
               <Link href="/" className="glitch-btn text-lg px-6 py-2 animate-glow-btn">Home</Link>
             </div>
             <QuickCommandBar />
@@ -334,7 +353,7 @@ export default function Dashboard() {
             <h2 className="text-xl font-bold mb-2">Recent Conversation</h2>
             <div className="cyberpunk-chatlog neon-border holo shadow-lg relative animate-glow-card" style={{zIndex:2, maxHeight:260, overflowY:'auto', background: theme === 'cyberpunk' ? 'rgba(20,24,40,0.7)' : 'rgba(30,30,30,0.7)', borderRadius: 12}}>
               {memory && memory.conversation && memory.conversation.length > 0 ? (
-                memory.conversation.slice(-7).map((msg: any, i: number) => (
+                memory.conversation.slice(-7).map((msg: ConversationMessage, i: number) => (
                   <div key={i} className="mb-2">
                     <span className={msg.speaker === "bot" ? "text-blue-600 font-semibold" : "text-green-700 font-semibold"}>
                       {msg.speaker === "bot" ? "Steve" : "You"}
@@ -359,7 +378,7 @@ export default function Dashboard() {
             <h2 className="text-xl font-bold mb-2">Objects Detected</h2>
             <ul className="cyberpunk-section-text mb-4">
               {memory && memory.objects && Object.entries(memory.objects).length > 0 ? (
-                Object.entries(memory.objects).map(([obj, arr]: any) => (
+                Object.entries(memory.objects).map(([obj, arr]: [string, unknown[]]) => (
                   <li key={obj} className="flex items-center gap-2">
                     <span className="font-semibold text-blue-700 dark:text-blue-300">{obj}</span>
                     <svg width="16" height="16" className="inline-block" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" stroke="#00f0ff" strokeWidth="2" fill="none"/></svg>

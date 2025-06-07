@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import CyberpunkNavbar from "../components/CyberpunkNavbar";
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -35,7 +36,7 @@ export default function SignupPage() {
       } else {
         setError(data.error || "Failed to send OTP");
       }
-    } catch (err) {
+    } catch {
       setError("Network error");
     }
     setLoading(false);
@@ -60,7 +61,7 @@ export default function SignupPage() {
       } else {
         setError(data.error || "Invalid OTP");
       }
-    } catch (err) {
+    } catch {
       setError("Network error");
     }
     setLoading(false);
@@ -85,14 +86,14 @@ export default function SignupPage() {
       } else {
         setError(data.error || "Signup failed");
       }
-    } catch (err) {
+    } catch {
       setError("Network error");
     }
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden cyberpunk-bg text-foreground" style={{fontFamily: "'Share Tech Mono', 'VT323', 'Fira Mono', monospace"}}>
+    <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden cyberpunk-bg text-foreground" style={{fontFamily: "\'Share Tech Mono\', \'VT323\', \'Fira Mono\', monospace"}}>
       <CyberpunkNavbar />
       <div className="hud-lines" />
       <div className="max-w-md mx-auto p-8 neon-border holo shadow-lg relative z-10 rounded-2xl text-center" style={{marginTop: '6rem'}}>
@@ -152,7 +153,7 @@ export default function SignupPage() {
         {success && <div className="text-green-400 mt-4">Signup successful! Redirecting...</div>}
         {error && <div className="text-red-500 mt-4">{error}</div>}
         <div className="mt-4">
-          Already have an account? <a href="/login" className="text-neon-blue underline">Login</a>
+          Already have an account? <Link href="/login" className="text-neon-blue underline">Login</Link>
         </div>
       </div>
     </div>

@@ -68,7 +68,7 @@ function SystemResourceMonitor() {
         if (!res.ok) throw new Error('Failed to fetch system stats');
         const data = await res.json();
         if (mounted) setResources({ cpu: data.cpu, ram: data.ram, net: data.net });
-      } catch (e: any) {
+      } catch {
         if (mounted) setError('System stats unavailable');
       }
     }
@@ -213,7 +213,7 @@ export default function StatsPage() {
         {/* Main Content */}
         <main className="flex-1 min-w-[320px] max-w-2xl mx-auto md:mx-0 bg-opacity-80 rounded-2xl p-6 md:p-8 shadow-xl backdrop-blur-md border border-blue-900 flex flex-col gap-6 animate-glow-card" style={{background: "rgba(24,28,48,0.92)"}}>
           <div className="flex flex-col md:flex-row gap-4 justify-between items-center mb-2">
-            <h1 className="text-4xl font-bold glitch tracking-widest">Today's Stats</h1>
+            <h1 className="text-4xl font-bold glitch tracking-widest">Today&apos;s Stats</h1>
             <div className="flex gap-2">
               <button className="glitch-btn px-4 py-2 animate-glow-btn" onClick={handleRefresh}>Refresh</button>
               <button className="glitch-btn px-4 py-2 animate-glow-btn" onClick={handleDownload}>Download Stats</button>
@@ -267,7 +267,7 @@ export default function StatsPage() {
                     <>
                       <div className="text-sm text-gray-200 mb-1">{(bestMsg as MoodPoint).speaker} ({new Date((bestMsg as MoodPoint).timestamp).toLocaleTimeString()}): <span className="text-neon-blue">{(bestMsg as MoodPoint).mood > 0.1 ? 'Positive' : 'Neutral'}</span></div>
                       {(bestMsg as MoodPoint).message && (
-                        <div className="text-base text-gray-100 italic border-l-4 border-neon-blue pl-3 mt-1">"{(bestMsg as MoodPoint).message}"</div>
+                        <div className="text-base text-gray-100 italic border-l-4 border-neon-blue pl-3 mt-1">&quot;{(bestMsg as MoodPoint).message}&quot;</div>
                       )}
                     </>
                   ) : <div className="text-xs text-gray-400">No data</div>}
@@ -279,7 +279,7 @@ export default function StatsPage() {
                     <>
                       <div className="text-sm text-gray-200 mb-1">{(worstMsg as MoodPoint).speaker} ({new Date((worstMsg as MoodPoint).timestamp).toLocaleTimeString()}): <span className="text-neon-pink">{(worstMsg as MoodPoint).mood < -0.1 ? 'Negative' : 'Neutral'}</span></div>
                       {(worstMsg as MoodPoint).message && (
-                        <div className="text-base text-gray-100 italic border-l-4 border-neon-pink pl-3 mt-1">"{(worstMsg as MoodPoint).message}"</div>
+                        <div className="text-base text-gray-100 italic border-l-4 border-neon-pink pl-3 mt-1">&quot;{(worstMsg as MoodPoint).message}&quot;</div>
                       )}
                     </>
                   ) : <div className="text-xs text-gray-400">No data</div>}
@@ -291,7 +291,7 @@ export default function StatsPage() {
                     <>
                       <div className="text-sm text-gray-200 mb-1">{(lastMsg as MoodPoint).speaker} ({new Date((lastMsg as MoodPoint).timestamp).toLocaleTimeString()}): <span className="text-neon-blue">{(lastMsg as MoodPoint).mood > 0.1 ? 'Positive' : (lastMsg as MoodPoint).mood < -0.1 ? 'Negative' : 'Neutral'}</span></div>
                       {(lastMsg as MoodPoint).message && (
-                        <div className="text-base text-gray-100 italic border-l-4 border-neon-blue pl-3 mt-1">"{(lastMsg as MoodPoint).message}"</div>
+                        <div className="text-base text-gray-100 italic border-l-4 border-neon-blue pl-3 mt-1">&quot;{(lastMsg as MoodPoint).message}&quot;</div>
                       )}
                     </>
                   ) : <div className="text-xs text-gray-400">No data</div>}

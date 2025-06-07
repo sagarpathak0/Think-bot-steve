@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import CyberpunkNavbar from "../components/CyberpunkNavbar";
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -26,13 +27,13 @@ export default function LoginPage() {
       } else {
         setError(data.error || "Login failed");
       }
-    } catch (err) {
+    } catch {
       setError("Network error");
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden" style={{background: "linear-gradient(135deg, #0a001a 60%, #1a0033 100%)", color: "#e0e0ff", fontFamily: "'Share Tech Mono', 'VT323', 'Fira Mono', monospace"}}>
+    <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden" style={{background: "linear-gradient(135deg, #0a001a 60%, #1a0033 100%)", color: "#e0e0ff", fontFamily: "\'Share Tech Mono\', \'VT323\', \'Fira Mono\', monospace"}}>
       <CyberpunkNavbar />
       <div className="max-w-md mx-auto p-8 neon-border holo shadow-lg relative z-10 rounded-2xl text-center" style={{marginTop: '6rem'}}>
         <h1 className="text-4xl font-bold glitch mb-6 tracking-widest">Login</h1>
@@ -58,7 +59,7 @@ export default function LoginPage() {
         </form>
         {error && <div className="text-red-500 mt-4">{error}</div>}
         <div className="mt-4">
-          Don't have an account? <a href="/signup" className="text-neon-blue underline">Sign up</a>
+          Don&apos;t have an account? <Link href="/signup" className="text-neon-blue underline">Sign up</Link>
         </div>
       </div>
     </div>

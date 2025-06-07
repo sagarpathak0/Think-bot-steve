@@ -9,7 +9,7 @@ export default function Home() {
       style={{
         background: "linear-gradient(135deg, #0a001a 60%, #1a0033 100%)",
         color: "#e0e0ff",
-        fontFamily: "'Share Tech Mono', 'VT323', 'Fira Mono', monospace",
+        fontFamily: "\'Share Tech Mono\', \'VT323\', \'Fira Mono\', monospace",
       }}
     >
       <CyberpunkNavbar />
@@ -29,7 +29,7 @@ export default function Home() {
             Start Chat
           </Link>
           <Link href="/stats" className="glitch-btn text-lg px-6 py-2">
-            Today's Stats
+            Today&apos;s Stats
           </Link>
         </div>
       </div>
