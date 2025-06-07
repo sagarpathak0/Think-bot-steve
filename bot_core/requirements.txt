@@ -25,3 +25,4 @@ langdetect
 flask_cors
 PyJWT
 bcrypt
+textblob
