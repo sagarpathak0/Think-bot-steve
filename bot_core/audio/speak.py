@@ -8,9 +8,13 @@ import pygame
 class SpeechEngine:
     def __init__(self, voice="en-US-JennyNeural"):
         self.voice = voice
-        # Initialize pygame mixer
-        pygame.mixer.init()
-        pygame.mixer.quit()  # Quit immediately to avoid resource conflicts
+        # Only try to init audio if not in headless/server mode (e.g. cloud)
+        if not os.environ.get("DISABLE_AUDIO", "1") == "1":
+            try:
+                pygame.mixer.init()
+                pygame.mixer.quit()  # Quit immediately to avoid resource conflicts
+            except Exception as e:
+                print("Audio init failed:", e)
         
     def _play_mp3(self, path):
         """Play an MP3 file using pygame"""
