@@ -1,0 +1,23 @@
+# requirements.txt for bot_core (Vercel backend)
+Flask
+psycopg2-binary
+python-dotenv
+google-auth
+google-auth-oauthlib
+google-api-python-client
+requests
+googletrans==4.0.0rc1
+opencv-python
+pytesseract
+torch
+torchvision
+pyttsx3
+SpeechRecognition
+google-generativeai
+edge_tts
+pygame
+pyaudio
+pandas
+seaborn
+sounddevice
+ultralytics
