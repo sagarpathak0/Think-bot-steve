@@ -2,14 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "next.config.ts",
+      "src": "package.json",
       "use": "@vercel/next"
     }
   ],
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "http://localhost:5000/api/$1"
+      "destination": "https://think-bot-steve.onrender.com/api/$1"
     }
   ]
 }
