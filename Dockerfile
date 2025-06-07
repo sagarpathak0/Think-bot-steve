@@ -24,8 +24,12 @@ COPY . .
 RUN pip install --upgrade pip
 RUN pip install -r bot_core/requirements.txt
 
-# Expose the port (Render uses $PORT)
-EXPOSE 10000
 
+
+# Expose a random high port (e.g. 49152, in the dynamic/private range)
+EXPOSE 49152
+
+# Set environment variable to disable audio in cloud
+ENV DISABLE_AUDIO=1
 # Start the app (Render sets $PORT env variable)
 CMD ["python", "-m", "bot_core.api_server"]

@@ -9,7 +9,7 @@ from bot_core.utils.db import ensure_tables
 from bot_core.routes import auth, chat, control
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
+CORS(app, supports_credentials=True, origins=["http://localhost:3000","https://think-bot-steve.vercel.app"])
 engine = DecisionEngine()
 
 ensure_tables()
