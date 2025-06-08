@@ -31,5 +31,7 @@ EXPOSE 5000
 
 # Set environment variable to disable audio in cloud
 ENV DISABLE_AUDIO=1
+# Set YOLO config dir to suppress Ultralytics warning
+ENV YOLO_CONFIG_DIR=/tmp
 # Start the app (Render sets $PORT env variable)
 CMD ["python", "-m", "bot_core.api_server"]

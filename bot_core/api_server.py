@@ -1,12 +1,21 @@
 
 # --- Email imports ---
 
+print("=== App starting ===")
 from flask import Flask, jsonify
 import psutil
 from flask_cors import CORS
+print("=== Flask, psutil, and CORS imported ===")
+
+print("=== Importing internal modules ===")
 from control.decision_engine import DecisionEngine
 from bot_core.utils.db import ensure_tables
 from bot_core.routes import auth, chat, control
+print("=== Internal modules imported ===")
+
+app = Flask(__name__)
+print("=== Flask app created ===")
+
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True, origins=["http://localhost:3000","https://think-bot-steve.vercel.app"])
@@ -62,4 +71,6 @@ import os
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
+    print(f"=== Starting Flask server on port {port} ===")
     app.run(host="0.0.0.0", port=port, debug=True)
+
