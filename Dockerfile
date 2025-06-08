@@ -27,7 +27,7 @@ RUN pip install -r bot_core/requirements.txt
 
 
 # Expose a random high port (e.g. 49152, in the dynamic/private range)
-EXPOSE 49152
+EXPOSE 5000
 
 # Set environment variable to disable audio in cloud
 ENV DISABLE_AUDIO=1
