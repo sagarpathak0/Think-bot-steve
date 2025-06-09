@@ -1,75 +1,12 @@
 import { useEffect, useState, useRef } from "react";
 import CyberpunkNavbar from "../components/CyberpunkNavbar";
-// --- Sidebar Widgets (copied from dashboard/stats) ---
-const aiTips = [
-  "Tip: You can refresh to see new objects detected!",
-  "News: Chat now supports cyberpunk mood bubbles!",
-  "Tip: Use the summary to reflect on your conversation.",
-  "News: Objects detected are now shown in real time.",
-  "Tip: Stay positive and chat with Steve!",
-];
-function UserProfileCard() {
-  const [user, setUser] = useState<{username: string, email: string} | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  useEffect(() => {
-    const token = localStorage.getItem("jwt_token");
-    if (!token) return;
-    fetch(`${BASE_URL}/me`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.username) setUser(data);
-        else setError("Could not load user info");
-        setLoading(false);
-      })
-      .catch(() => { setError("Could not load user info"); setLoading(false); });
-  }, []);
-  return (
-    <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-blue-900/60 to-pink-900/40 border border-blue-700 mb-2 animate-glow-card">
-      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-pink-500 flex items-center justify-center border-2 border-neon-blue">
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#0a001a"/><path d="M10 22v-1a4 4 0 014-4h4a4 4 0 014 4v1" stroke="#00f0ff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><circle cx="16" cy="14" r="3" fill="#ff00de"/></svg>
-      </div>
-      <div>
-        <div className="font-bold text-neon-blue text-lg">
-          {loading ? 'Loading...' : error ? 'User' : user?.username}
-        </div>
-        <div className="text-xs text-neon-pink">
-          {error ? error : user?.email || 'Cyberpunk Operator'}
-        </div>
-      </div>
-    </div>
-  );
-}
-function LiveClock() {
-  const [now, setNow] = useState<Date|null>(null);
-  useEffect(() => {
-    setNow(new Date());
-    const timer = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-  if (!now) return null;
-  return (
-    <div className="font-mono text-neon-blue text-lg tracking-widest text-center mb-2 animate-glow">
-      {now.toLocaleTimeString()}<span className="text-neon-pink text-base ml-2">{now.toLocaleDateString()}</span>
-    </div>
-  );
-}
-function AITipsWidget() {
-  const [idx, setIdx] = useState(0);
-  useEffect(() => {
-    const timer = setInterval(() => setIdx(i => (i+1)%aiTips.length), 5000);
-    return () => clearInterval(timer);
-  }, []);
-  return (
-    <div className="w-full mb-4 p-3 rounded-xl bg-gradient-to-r from-blue-900/60 to-pink-900/40 border border-blue-700 animate-glow-card text-neon-blue text-center text-base font-mono">
-      <span className="text-neon-pink mr-2">&#9889;</span>{aiTips[idx]}
-    </div>
-  );
-}
+import Sidebar from "../components/Sidebar";
+import ChatLog from "../components/ChatLog";
+import ChatInputForm from "../components/ChatInputForm";
+import TTSVoiceSelector from "../components/TTSVoiceSelector";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 
 
 type Message = {
@@ -90,23 +27,118 @@ const ChatPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
-  // Removed stats state and loading for chat page
+  const [selectedVoiceName, setSelectedVoiceName] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('selectedVoiceName') || "";
+    }
+    return "";
+  });
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // State for TTS voices
+  const [voicesLoaded, setVoicesLoaded] = useState(false);
+  const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
+
+  // Effect to load voices on component mount
+  useEffect(() => {
+    let mounted = true; // To prevent state updates on unmounted component
+
+    const loadVoicesHandler = () => {
+      if (!mounted || !('speechSynthesis' in window)) return;
+      const synthVoices = window.speechSynthesis.getVoices();
+      if (synthVoices.length > 0) {
+        console.log("Available TTS voices (loaded):", synthVoices);
+        setAvailableVoices(synthVoices);
+        setVoicesLoaded(true);
+        window.speechSynthesis.onvoiceschanged = null; // Remove listener once voices are loaded
+      }
+    };
+
+    if ('speechSynthesis' in window) {
+      const initialVoices = window.speechSynthesis.getVoices();
+      if (initialVoices.length > 0) {
+        loadVoicesHandler(); // Voices might be available immediately
+      } else {
+        window.speechSynthesis.onvoiceschanged = loadVoicesHandler;
+        // Fallback timeout in case onvoiceschanged doesn't fire or is too slow
+        const timerId = setTimeout(() => {
+          if (mounted && !voicesLoaded) {
+            console.log("Voice loading timeout, attempting to load manually...");
+            loadVoicesHandler();
+          }
+        }, 750); // 750ms timeout
+        return () => { clearTimeout(timerId); }; // Clear timeout on component unmount
+      }
+    }
+
+    return () => {
+      mounted = false;
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.onvoiceschanged = null; // Clean up listener
+      }
+    };
+  }, []); // Empty dependency array ensures this runs once on mount and cleans up on unmount
 
   // Function to speak text using browser's SpeechSynthesis API
   const speakText = (text: string) => {
-    if ('speechSynthesis' in window) {
-      // Remove any markdown-like characters or trailing punctuation for cleaner speech
-      const cleanedText = text.replace(/!!$/, '').replace(/[*_`~]/g, '');
-      const utterance = new SpeechSynthesisUtterance(cleanedText);
-      // Optionally, you can configure the voice, rate, pitch, etc.
-      // For example, to find a specific voice:
-      // const voices = window.speechSynthesis.getVoices();
-      // utterance.voice = voices.find(voice => voice.name === 'Google UK English Female'); // Example voice
-      window.speechSynthesis.speak(utterance);
-    } else {
-      console.warn("Browser does not support SpeechSynthesis.");
+    if (!('speechSynthesis' in window)) {
+      console.warn("SpeechSynthesis not supported in this browser.");
+      return;
     }
+
+    const cleanedText = text.replace(/!!$/, '').replace(/[*_`~]/g, '');
+    const utterance = new SpeechSynthesisUtterance(cleanedText);
+    utterance.lang = 'en-US'; // Set desired language
+
+    if (voicesLoaded && availableVoices.length > 0) {
+      let selectedVoice: SpeechSynthesisVoice | undefined = undefined;
+
+      // 1. Use the user-selected voice from dropdown
+      if (selectedVoiceName && selectedVoiceName.trim() !== "") {
+        selectedVoice = availableVoices.find(voice => voice.name === selectedVoiceName);
+        if (selectedVoice) {
+          console.log(`Using user-selected voice: ${selectedVoice.name}`);
+        } else {
+          console.warn(`Selected voice '${selectedVoiceName}' not found. Falling back to other options.`);
+        }
+      }
+
+      // 2. If no user-selected voice or not found, try Google US English
+      if (!selectedVoice) {
+        selectedVoice = availableVoices.find(voice => voice.name === 'Google US English' && voice.lang.startsWith('en-US'));
+      }
+
+      // 3. Fallback to other English voices if still not found
+      if (!selectedVoice) {
+        selectedVoice = availableVoices.find(voice => voice.name.toLowerCase().includes('english') && voice.lang.startsWith('en-US') && voice.localService);
+      }
+      if (!selectedVoice) {
+        selectedVoice = availableVoices.find(voice => voice.lang.startsWith('en-US') && voice.localService); 
+      }
+      if (!selectedVoice) {
+        selectedVoice = availableVoices.find(voice => voice.lang.startsWith('en-US')); 
+      }
+      if (!selectedVoice) {
+        selectedVoice = availableVoices.find(voice => voice.lang.startsWith('en-') && voice.localService);
+      }
+      if (!selectedVoice) {
+        selectedVoice = availableVoices.find(voice => voice.lang.startsWith('en-')); 
+      }
+
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+        if (!(selectedVoiceName && utterance.voice.name === selectedVoiceName)) {
+            console.log(`Using fallback voice: ${selectedVoice.name} (Lang: ${selectedVoice.lang}, Local: ${selectedVoice.localService})`);
+        }
+      } else {
+        console.warn("No suitable English voice found in pre-loaded list. Using browser default for en-US.");
+      }
+    } else {
+      console.warn("Voices not yet loaded or no voices available. Attempting to speak with browser default for en-US.");
+    }
+    
+    window.speechSynthesis.cancel(); // Cancel any previous speech to avoid overlap
+    window.speechSynthesis.speak(utterance);
   };
 
   // Fetch memory/chat log (with JWT and 401 handling)
@@ -221,38 +253,26 @@ const ChatPage = () => {
     setSending(false);
   };
 
+  // Handle voice selection change
+  const handleVoiceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const voiceName = e.target.value;
+    setSelectedVoiceName(voiceName);
+    localStorage.setItem('selectedVoiceName', voiceName);
+
+    // Optionally, you can also speak a test message with the selected voice
+    if (voiceName) {
+      const testUtterance = new SpeechSynthesisUtterance("Voice changed to " + voiceName);
+      testUtterance.voice = availableVoices.find(voice => voice.name === voiceName) || null;
+      window.speechSynthesis.speak(testUtterance);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden transition-colors duration-500" style={{background: "linear-gradient(135deg, #0a001a 60%, #1a0033 100%)", color: "#e0e0ff", fontFamily: "\'Share Tech Mono\', \'VT323\', \'Fira Mono\', monospace"}}>
       <CyberpunkNavbar />
       <div className="w-full mx-auto flex flex-col md:flex-row gap-8 px-0 md:px-4 mt-32 z-10" style={{maxWidth: '100vw'}}>
         {/* Info/Sidebar (30%) */}
-        <aside className="w-full md:w-[30%] max-w-none mx-0 bg-opacity-80 rounded-2xl p-6 shadow-xl backdrop-blur-md border border-blue-900 flex flex-col gap-4 animate-glow-card" style={{background: "rgba(24,32,60,0.92)"}}>
-          <UserProfileCard />
-          <LiveClock />
-          <AITipsWidget />
-          {/* Summary and Objects Cards */}
-          {data && (
-            <>
-              <div className="flex flex-col p-3 rounded-xl bg-gradient-to-r from-blue-900/60 to-pink-900/40 border border-blue-700 animate-glow-card">
-                <div className="font-bold text-neon-blue mb-1">Summary</div>
-                <div className="text-base text-gray-100">{data.summary || "No summary yet."}</div>
-              </div>
-              <div className="flex flex-col p-3 rounded-xl bg-gradient-to-r from-blue-900/60 to-pink-900/40 border border-blue-700 animate-glow-card">
-                <div className="font-bold text-neon-pink mb-1">Objects Detected</div>
-                <ul className="text-base text-gray-100">
-                  {data.objects && Object.entries(data.objects).length === 0 && <li>No objects detected yet.</li>}
-                  {data.objects && Object.entries(data.objects).map(([obj, arr]) => (
-                    <li key={obj}>
-                      <span className="font-semibold text-neon-blue">{obj}</span>
-                      {": "}
-                      <span className="text-neon-pink">{arr.length} time(s)</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </>
-          )}
-        </aside>
+        <Sidebar data={data} />
         {/* Main Chat Area (70%) */}
         <main className="w-full md:w-[70%] mx-0 bg-opacity-80 rounded-2xl p-6 md:p-8 shadow-xl backdrop-blur-md border border-blue-900 flex flex-col gap-6 animate-glow-card" style={{background: "rgba(24,28,48,0.92)"}}>
           <h1 className="text-4xl font-bold glitch tracking-widest text-center mb-2">STEVE <span className="flicker text-neon-pink">Think-Bot</span> <span className="flicker text-neon-blue">AI</span></h1>
@@ -260,57 +280,21 @@ const ChatPage = () => {
           {error && <div className="text-red-500">{error}</div>}
           {data ? (
             <>
-              <div className="cyberpunk-chatlog neon-border holo shadow-lg relative mb-4 max-h-[340px] overflow-y-auto p-4 rounded-xl bg-gradient-to-br from-blue-900/40 to-pink-900/20 border border-blue-700 animate-glow-card custom-scrollbar" style={{zIndex:2}}>
-                {Array.isArray(data.conversation) && data.conversation.length > 0 ? (
-                  data.conversation.map((msg, i) => {
-                    return (
-                      <div key={i} className={"mb-3 flex " + (msg.speaker === "bot" ? "justify-start" : "justify-end")}> 
-                        <div className={"max-w-[80%] px-4 py-2 rounded-2xl shadow-md " +
-                          (msg.speaker === "bot" ? "bg-gradient-to-r from-blue-900/80 to-pink-900/40 border border-blue-700 text-neon-blue animate-glow-card" : "bg-gradient-to-r from-pink-900/80 to-blue-900/40 border border-pink-700 text-neon-pink animate-glow-card")
-                        }>
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className={msg.speaker === "bot" ? "font-bold text-neon-blue" : "font-bold text-neon-pink"}>
-                              {msg.speaker === "bot" ? "Steve" : "You"}
-                            </span>
-                            <span className="text-xs text-gray-400">{new Date(msg.timestamp).toLocaleTimeString()}</span>
-                          </div>
-                          <div className="whitespace-pre-line text-base">{msg.message.replace(/!!$/, "")}</div>
-                        </div>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <div className="text-gray-400">No conversation yet.</div>
-                )}
-                <div ref={messagesEndRef} />
-              </div>
-              {/* Chat input and refresh button */}
-              <form onSubmit={handleSubmit} className="flex gap-2 items-center neon-border holo p-2 rounded-xl bg-gradient-to-r from-blue-900/60 to-pink-900/40 border border-blue-700 animate-glow-card" style={{zIndex:2}}>
-                <input
-                  className="cyberpunk-input flex-1 bg-transparent border-none outline-none text-lg px-3 py-2 rounded-xl"
-                  type="text"
-                  value={input}
-                  onChange={e => setInput(e.target.value)}
-                  placeholder="Type your message..."
-                  disabled={sending}
-                  autoFocus
-                />
-                <button
-                  type="submit"
-                  className="glitch-btn px-4 py-2"
-                  disabled={sending || !input.trim()}
-                >
-                  {sending ? <span className="flicker">Sending...</span> : <span className="flicker">Send</span>}
-                </button>
-                <button
-                  type="button"
-                  className="glitch-btn px-4 py-2"
-                  onClick={() => { fetchData(); }}
-                  disabled={loading || sending}
-                >
-                  Refresh
-                </button>
-              </form>
+              <ChatLog conversation={data.conversation} messagesEndRef={messagesEndRef} />
+              <ChatInputForm
+                input={input}
+                setInput={setInput}
+                sending={sending}
+                loading={loading}
+                onSubmit={handleSubmit}
+                onRefresh={fetchData}
+              />
+              <TTSVoiceSelector
+                selectedVoiceName={selectedVoiceName}
+                onChange={handleVoiceChange}
+                voicesLoaded={voicesLoaded}
+                availableVoices={availableVoices}
+              />
             </>
           ) : null}
         </main>
