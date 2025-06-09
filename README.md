@@ -13,7 +13,7 @@ The dashboard and all web UI use a custom **cyberpunk/neon** theme with:
 - Pixel/monospace fonts
 - Animated backgrounds and console-style layouts
 
-For a visual preview, see the `frontend/src/styles/globals.css` and the dashboard page. (Add screenshots here if desired.)
+For a visual preview, see the `frontend/src/styles/globals.css` and the dashboard page.
 
 ---
 
@@ -292,6 +292,8 @@ See `API_DOCS.txt` for full details. Here are the main endpoints:
   - Configured custom domain [https://think-bot-steve.me](https://think-bot-steve.me) with Elastic IP and DNS.
   - Resolved all CORS, Python dependency (e.g., _cffi_backend for Certbot), and system package issues.
   - Created comprehensive `DEPLOYMENT_GUIDE.txt`.
+- **Backend (June 9, 2025):**
+  - Updated `/stats` endpoint and `mood_utils.py` to consistently use the LLM-generated summary from `engine.memory.memory` if available, falling back to a basic concatenated summary. This ensures the stats page displays the same high-quality summary as other parts of the application.
 - **Security (June 5, 2025):** All secrets moved to `.env`, JWT for all user endpoints, PostgreSQL for all user/chat data.
 - **Frontend (June 5, 2025):** Modern dashboard layout, Astra theme, device control panel, and improved navigation.
 - **Backend (June 5, 2025):** New `/control` API for robot/device commands, all endpoints CORS and JWT protected.
