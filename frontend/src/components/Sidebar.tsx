@@ -1,6 +1,7 @@
 import UserProfileCard from "./UserProfileCard";
 import LiveClock from "./LiveClock";
 import AITipsWidget from "./AITipsWidget";
+import SummaryCard from "./SummaryCard";
 
 interface SidebarProps {
   data: {
@@ -18,10 +19,7 @@ export default function Sidebar({ data }: SidebarProps) {
       {/* Summary and Objects Cards */}
       {data && (
         <>
-          <div className="flex flex-col p-3 rounded-xl bg-gradient-to-r from-blue-900/60 to-pink-900/40 border border-blue-700 animate-glow-card">
-            <div className="font-bold text-neon-blue mb-1">Summary</div>
-            <div className="text-base text-gray-100">{data.summary || "No summary yet."}</div>
-          </div>
+          <SummaryCard summary={data.summary} />
           <div className="flex flex-col p-3 rounded-xl bg-gradient-to-r from-blue-900/60 to-pink-900/40 border border-blue-700 animate-glow-card">
             <div className="font-bold text-neon-pink mb-1">Objects Detected</div>
             <ul className="text-base text-gray-100">

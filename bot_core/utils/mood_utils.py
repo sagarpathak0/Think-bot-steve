@@ -2,7 +2,7 @@ from datetime import date
 from textblob import TextBlob
 from .db import get_db_conn
 
-def get_today_conversation_and_mood_db(user_id):
+def get_today_conversation_and_mood_db(user_id, engine=None):
     today = date.today().isoformat()
     with get_db_conn() as conn:
         with conn.cursor() as cur:
@@ -15,7 +15,12 @@ def get_today_conversation_and_mood_db(user_id):
     today_msgs = [
         {"timestamp": r[0].isoformat(), "speaker": r[1], "message": r[2]} for r in rows
     ]
-    summary = "\n".join(f"{m['speaker']}: {m['message']}" for m in today_msgs)
+    # Use LLM-generated summary if available
+    summary = None
+    if engine and hasattr(engine, "memory") and hasattr(engine.memory, "memory"):
+        summary = engine.memory.memory.get("summary", None)
+    if not summary:
+        summary = "\n".join(f"{m['speaker']}: {m['message']}" for m in today_msgs)
     mood_timeline = []
     mood_score_total = 0
     mood_count = 0

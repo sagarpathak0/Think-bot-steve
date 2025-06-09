@@ -1,3 +1,4 @@
+import SummaryCard from "../components/SummaryCard";
 
 
 import { useEffect, useState } from "react";
@@ -224,7 +225,7 @@ export default function StatsPage() {
             <>
               <div className="mb-4 flex flex-col md:flex-row gap-4 justify-between items-center">
                 <div className="text-left flex-1">
-                  <div className="text-neon-blue text-lg font-mono mb-2"><strong>Summary:</strong> {stats.summary || "No summary yet."}</div>
+                  <SummaryCard summary={stats.summary || "No summary yet."} className="mb-2" />
                   <div className="mb-1"><strong>Mood:</strong> {typeof stats.avg_mood === 'number' ? (stats.avg_mood > 0.1 ? "😊" : stats.avg_mood < -0.1 ? "😞" : "😐") : "-"} ({typeof stats.avg_mood === 'number' ? stats.avg_mood.toFixed(2) : "-"})</div>
                   <div className="mb-1"><strong>Messages Today:</strong> {typeof stats.count === 'number' ? stats.count : "-"}</div>
                   {moodBreakdown && (

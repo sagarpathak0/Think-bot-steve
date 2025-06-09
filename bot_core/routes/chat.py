@@ -55,5 +55,5 @@ def register_routes(app, engine=None):
         user_id = get_user_id_from_token()
         if not user_id:
             return jsonify({"error": "Unauthorized"}), 401
-        stats = get_today_conversation_and_mood_db(user_id)
+        stats = get_today_conversation_and_mood_db(user_id, engine=engine)
         return jsonify(stats)

@@ -89,9 +89,11 @@ class Memory:
         # Create a text block of the conversation
         convo_text = "\n".join([f"{c['speaker']}: {c['message']}" for c in history])
         prompt = (
-            "Summarize the following conversation between a user and an AI assistant. "
-            "Keep the summary concise but include all important facts, names, and context. "
-            "This summary will be used as context for future conversations.\n\n"
+            "You are an expert conversation summarizer. Read the following full conversation between a user and an AI assistant. "
+            "Write a detailed, well-structured summary that captures all important facts, names, context, and the flow of the discussion. "
+            "Do NOT simply repeat the conversation line by line. Instead, synthesize the main ideas, topics, and any key decisions or facts mentioned. "
+            "If the conversation is long, your summary can be as long as needed to cover all relevant points, but avoid unnecessary repetition. "
+            "This summary will be used as context for future conversations, so make it as informative and clear as possible.\n\n"
             f"{convo_text}\n\nSummary:"
         )
         summary = ai.ask(prompt)

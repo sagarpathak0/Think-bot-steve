@@ -1,3 +1,4 @@
+import SummaryCard from "../components/SummaryCard";
 // User Profile Card
 function UserProfileCard() {
   const [user, setUser] = useState<{username: string, email: string} | null>(null);
@@ -339,7 +340,7 @@ export default function Dashboard() {
           <AITipsWidget />
           <section>
             <h2 className="text-2xl font-bold mb-2">Welcome{memory && memory.conversation && memory.conversation.length > 0 ? `, ${memory.conversation[memory.conversation.length-1].speaker === 'user' ? 'User' : 'Steve'}` : ''}!</h2>
-            <div className="mb-2"><strong>Today&apos;s Summary:</strong> {stats?.summary || "No summary yet."}</div>
+            <SummaryCard summary={stats?.summary || "No summary yet."} className="mb-2" />
             <div className="mb-2"><strong>Mood:</strong> {typeof stats?.avg_mood === 'number' ? (stats.avg_mood > 0.1 ? "😊" : stats.avg_mood < -0.1 ? "😞" : "😐") : "-"} ({typeof stats?.avg_mood === 'number' ? stats.avg_mood.toFixed(2) : "-"})</div>
             <div className="mb-2"><strong>Messages Today:</strong> {typeof stats?.count === 'number' ? stats.count : "-"}</div>
             <div className="flex flex-col gap-2 mt-4">
