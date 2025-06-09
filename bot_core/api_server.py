@@ -18,7 +18,16 @@ print("=== Flask app created ===")
 
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=["http://localhost:3000","https://think-bot-steve.vercel.app"])
+CORS(
+    app,
+    supports_credentials=True,
+    origins=[
+        "http://localhost:3000",
+        "https://think-bot-steve.vercel.app",
+        "https://think-bot-steve.me",
+        "https://www.think-bot-steve.me"
+    ]
+)
 engine = DecisionEngine()
 
 ensure_tables()

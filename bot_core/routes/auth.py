@@ -104,7 +104,10 @@ def register_routes(app):
                 row = cur.fetchone()
                 if row:
                     hashed, is_verified = row
-                    if not is_verified:
+                    # Ensure hashed is a non-empty string
+                    if not isinstance(hashed, str) or not hashed:
+                        return make_response(jsonify({"error": "Invalid credentials"}), 401)
+                    if is_verified is None or not is_verified:
                         return make_response(jsonify({"error": "Email not verified. Please check your inbox."}), 401)
                     if bcrypt.checkpw(password.encode("utf-8"), hashed.encode("utf-8")):
                         payload = {

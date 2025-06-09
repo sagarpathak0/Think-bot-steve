@@ -1,0 +1,125 @@
+# Deployment Documentation for Think Bot Steve
+
+## 1. Domain & DNS Setup
+- Register your domain (e.g., think-bot-steve.me) on a registrar like Namecheap.
+- Allocate an AWS Elastic IP and associate it with your EC2 instance.
+- Update your domain’s A record to point to the Elastic IP.
+- Wait for DNS propagation.
+
+## 2. Backend (Flask) Deployment
+
+### System Preparation
+- Update and install required system packages:
+  sudo apt update
+  sudo apt install python3.11 python3.11-venv python3-pip git nginx libffi-dev libssl-dev
+
+### Clone and Set Up Backend
+- Clone your backend repository to the EC2 instance.
+- Create and activate a Python virtual environment:
+  python3.11 -m venv myenv
+  source myenv/bin/activate
+- Install Python dependencies:
+  pip install -r requirements.txt
+
+### Gunicorn Setup
+- Test Gunicorn manually:
+  gunicorn -w 4 -b 127.0.0.1:5000 bot_core.api_server:app
+- Create a systemd service file `/etc/systemd/system/thinkbot.service`:
+  [Unit]
+  Description=Gunicorn instance to serve thinkbot Flask app
+  After=network.target
+
+  [Service]
+  User=ubuntu
+  Group=www-data
+  WorkingDirectory=/home/ubuntu/Think-bot-steve
+  Environment="PATH=/home/ubuntu/Think-bot-steve/myenv/bin"
+  ExecStart=/home/ubuntu/Think-bot-steve/myenv/bin/gunicorn -w 4 -b 127.0.0.1:5000 bot_core.api_server:app
+
+  [Install]
+  WantedBy=multi-user.target
+- Enable and start the service:
+  sudo systemctl daemon-reload
+  sudo systemctl enable thinkbot
+  sudo systemctl start thinkbot
+  sudo systemctl status thinkbot
+
+## 3. Nginx Reverse Proxy Setup
+- Edit `/etc/nginx/sites-available/default` to:
+  - Redirect HTTP to HTTPS.
+  - Proxy HTTPS requests to Gunicorn.
+  - Do NOT add CORS headers in Nginx; let Flask handle them.
+
+  Example:
+  server {
+      listen 80;
+      server_name think-bot-steve.me www.think-bot-steve.me;
+      return 301 https://$host$request_uri;
+  }
+
+  server {
+      listen 443 ssl;
+      server_name think-bot-steve.me www.think-bot-steve.me;
+
+      ssl_certificate /etc/letsencrypt/live/think-bot-steve.me/fullchain.pem;
+      ssl_certificate_key /etc/letsencrypt/live/think-bot-steve.me/privkey.pem;
+      include /etc/letsencrypt/options-ssl-nginx.conf;
+      ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+      location / {
+          proxy_pass http://127.0.0.1:5000;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+      }
+  }
+- Test and reload Nginx:
+  sudo nginx -t
+  sudo systemctl reload nginx
+
+## 4. SSL with Certbot (Let's Encrypt)
+- Install Certbot (preferably via snap):
+  sudo snap install core; sudo snap refresh core
+  sudo snap install --classic certbot
+  sudo ln -s /snap/bin/certbot /usr/bin/certbot
+- Obtain and install SSL certificate:
+  sudo certbot --nginx -d think-bot-steve.me -d www.think-bot-steve.me
+- Certbot will update your Nginx config and reload Nginx.
+
+## 5. CORS Handling
+- Use Flask-CORS in your backend:
+  from flask_cors import CORS
+  CORS(app, supports_credentials=True, origins=[
+      "http://localhost:3000",
+      "https://think-bot-steve.vercel.app",
+      "https://think-bot-steve.me",
+      "https://www.think-bot-steve.me"
+  ])
+- Do NOT add CORS headers in Nginx.
+
+## 6. Frontend (Next.js) Deployment
+- Set `NEXT_PUBLIC_API_BASE_URL` in `frontend/.env.local` to your backend URL:
+  NEXT_PUBLIC_API_BASE_URL=https://think-bot-steve.me
+- Push your frontend code to GitHub.
+- Deploy the frontend on Vercel (https://think-bot-steve.vercel.app) and set the environment variable `NEXT_PUBLIC_API_BASE_URL` in the Vercel dashboard.
+
+## 7. Testing & Finalization
+- Test backend API directly (e.g., with curl) to ensure no redirects and correct CORS headers.
+- Test frontend (on Vercel and locally) to ensure it can communicate with the backend.
+- Ensure HTTPS is enforced and no CORS errors occur.
+- Confirm Gunicorn systemd service is running and enabled:
+  sudo systemctl status thinkbot
+  sudo systemctl enable thinkbot
+- Reboot the server to confirm all services auto-start.
+
+## 8. Troubleshooting
+- **CORS errors:** Ensure Flask handles all CORS, and Nginx does not interfere.
+- **SSL errors:** Ensure Nginx config matches Certbot output and certificates exist.
+- **Redirect loops:** Only redirect HTTP to HTTPS in the port 80 server block.
+- **Service issues:** Check Gunicorn logs (`journalctl -u thinkbot`) and Nginx logs (`/var/log/nginx/error.log`).
+
+---
+
+**Frontend is deployed on Vercel at https://think-bot-steve.vercel.app**
+**Backend is deployed on AWS EC2 at https://think-bot-steve.me**

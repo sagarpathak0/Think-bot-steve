@@ -171,14 +171,25 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
    npm run dev
    ```
 
-### Deployment
+---
 
-- **Local:** Run backend and frontend as above.
-- **Production:**
-  - Use a production WSGI server (e.g., gunicorn) for backend
-  - Use `npm run build && npm start` for frontend
-  - Set all environment variables securely
-  - (Optional) Use Docker for containerized deployment
+## Deployment
+
+The application is fully deployed with:
+
+- **Backend**: Flask app running on AWS EC2 with Gunicorn, Nginx, and SSL (via Certbot)
+- **Frontend**: Next.js app deployed on Vercel at [https://think-bot-steve.vercel.app](https://think-bot-steve.vercel.app)
+- **Domain**: Registered custom domain at [https://think-bot-steve.me](https://think-bot-steve.me)
+
+### Key Deployment Features:
+
+- HTTPS encryption with Let's Encrypt SSL certificates
+- Systemd service for reliable backend operation
+- Nginx as reverse proxy with proper CORS handling
+- Elastic IP for stable AWS addressing
+- JWT authentication for secure API access
+
+For detailed deployment instructions, see [DEPLOYMENT_GUIDE.txt](./DEPLOYMENT_GUIDE.txt).
 
 ---
 
@@ -258,7 +269,7 @@ See `API_DOCS.txt` for full details. Here are the main endpoints:
 
 ## License
 
-Specify your license here (MIT, GPL, or "All rights reserved").
+...........
 
 ---
 
@@ -273,11 +284,17 @@ Specify your license here (MIT, GPL, or "All rights reserved").
 
 ---
 
-## Recent Changes (as of June 5, 2025)
+## Recent Changes (as of June 9, 2025)
 
-- **Security:** All secrets moved to `.env`, JWT for all user endpoints, PostgreSQL for all user/chat data.
-- **Frontend:** Modern dashboard layout, Astra theme, device control panel, and improved navigation.
-- **Backend:** New `/control` API for robot/device commands, all endpoints CORS and JWT protected.
-- **Docs:** See `API_DOCS.txt` for all API endpoints, input/output, and authentication.
+- **Deployment (June 9, 2025):**
+  - Fully deployed backend (Flask/Gunicorn) on AWS EC2 with Nginx reverse proxy and SSL/HTTPS via Certbot.
+  - Deployed frontend (Next.js) on Vercel, accessible at [https://think-bot-steve.vercel.app](https://think-bot-steve.vercel.app).
+  - Configured custom domain [https://think-bot-steve.me](https://think-bot-steve.me) with Elastic IP and DNS.
+  - Resolved all CORS, Python dependency (e.g., _cffi_backend for Certbot), and system package issues.
+  - Created comprehensive `DEPLOYMENT_GUIDE.txt`.
+- **Security (June 5, 2025):** All secrets moved to `.env`, JWT for all user endpoints, PostgreSQL for all user/chat data.
+- **Frontend (June 5, 2025):** Modern dashboard layout, Astra theme, device control panel, and improved navigation.
+- **Backend (June 5, 2025):** New `/control` API for robot/device commands, all endpoints CORS and JWT protected.
+- **Docs (June 5, 2025):** See `API_DOCS.txt` for all API endpoints, input/output, and authentication.
 
-This README is up to date as of June 5, 2025.
+This README is up to date as of June 9, 2025.
