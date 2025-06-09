@@ -1,5 +1,3 @@
-
-
 import { useEffect, useState, useRef } from "react";
 import CyberpunkNavbar from "../components/CyberpunkNavbar";
 // --- Sidebar Widgets (copied from dashboard/stats) ---
@@ -95,6 +93,22 @@ const ChatPage = () => {
   // Removed stats state and loading for chat page
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Function to speak text using browser's SpeechSynthesis API
+  const speakText = (text: string) => {
+    if ('speechSynthesis' in window) {
+      // Remove any markdown-like characters or trailing punctuation for cleaner speech
+      const cleanedText = text.replace(/!!$/, '').replace(/[*_`~]/g, '');
+      const utterance = new SpeechSynthesisUtterance(cleanedText);
+      // Optionally, you can configure the voice, rate, pitch, etc.
+      // For example, to find a specific voice:
+      // const voices = window.speechSynthesis.getVoices();
+      // utterance.voice = voices.find(voice => voice.name === 'Google UK English Female'); // Example voice
+      window.speechSynthesis.speak(utterance);
+    } else {
+      console.warn("Browser does not support SpeechSynthesis.");
+    }
+  };
+
   // Fetch memory/chat log (with JWT and 401 handling)
   const fetchData = async () => {
     setLoading(true);
@@ -145,11 +159,18 @@ const ChatPage = () => {
   // Only scroll to bottom when a new message is sent (not on every refresh)
   const prevConversationLength = useRef<number>(0);
   useEffect(() => {
-    if (!data) return;
-    const len = data.conversation.length;
-    // Only scroll if a new message was added
+    if (!data || !data.conversation || data.conversation.length === 0) return;
+    const currentConversation = data.conversation;
+    const len = currentConversation.length;
+
+    // Only scroll and speak if a new message was added
     if (len > prevConversationLength.current) {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      const lastMessage = currentConversation[len - 1];
+      // Speak the last message if it's from the bot and it's a new message
+      if (lastMessage.speaker === "bot") {
+        speakText(lastMessage.message);
+      }
     }
     prevConversationLength.current = len;
   }, [data]);
@@ -190,7 +211,7 @@ const ChatPage = () => {
       const result = await res.json();
       if (result.reply) {
         setInput("");
-        fetchData();
+        fetchData(); // This will trigger the useEffect above to speak the new bot message
       } else if (result.error) {
         setError(result.error);
       }

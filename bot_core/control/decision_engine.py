@@ -8,7 +8,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from vision import WebcamStream
 from sensors.ultrasonic import distance_data
-from audio.speak import SpeechEngine
+# from audio.speak import SpeechEngine
 from .memory import Memory
 from personality.traits import Personality
 from language.translator import LanguageProcessor
@@ -47,13 +47,13 @@ class DecisionEngine:
                 ai_response = self.personality.add_enthusiasm(ai_response)
                 self.memory.add_conversation("bot", ai_response)
                 self.memory.save_memory()
-                self.speech.speak(ai_response)
+                # self.speech.speak(ai_response)
                 self.last_asked_objects.add(obj)
                 # Update the running summary after vision chat
                 self.memory.update_summary(self.ai)
         self.last_seen_objects = current_objects
     def __init__(self):
-        self.speech = SpeechEngine()
+        # self.speech = SpeechEngine()
         self.memory = Memory("bot_memory.json")
         self.personality = Personality()
         self.language = LanguageProcessor()
@@ -72,12 +72,12 @@ class DecisionEngine:
         if current_distance is not None and self.last_distance is not None:
             if current_distance < 30 and self.last_distance >= 30:
                 message = f"Object detected at {current_distance} centimeters."
-                self.speech.speak(message)
+                # self.speech.speak(message)
                 self.memory.add_conversation("bot", message)
                 self.memory.save_memory()  # Save after adding to memory
             elif current_distance > 100 and self.last_distance <= 100:
                 message = "Path is clear."
-                self.speech.speak(message)
+                # self.speech.speak(message)
                 self.memory.add_conversation("bot", message)
                 self.memory.save_memory()  # Save after adding to memory
                 
@@ -118,7 +118,7 @@ class DecisionEngine:
         self.memory.save_memory()  # Save after conversation is complete
         # Update the summary after each chat
         self.memory.update_summary(self.ai)
-        self.speech.speak(response)
+        # self.speech.speak(response)
         return response
             
     def run(self):

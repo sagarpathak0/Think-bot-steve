@@ -2,7 +2,7 @@
 # Expose key components for easier importing
 from .vision import WebcamStream, VisionSystem
 from .sensors import distance_data, start_ultrasonic_server, PIRSensor
-from .audio import SpeechEngine
+# from .audio import SpeechEngine
 from .control import DecisionEngine, Memory
 from .ai import GeminiClient
 from .language import LanguageProcessor
@@ -15,7 +15,7 @@ __all__ = [
     'distance_data', 
     'start_ultrasonic_server',
     'PIRSensor',
-    'SpeechEngine',
+    # 'SpeechEngine',
     'DecisionEngine',
     'Memory',
     'GeminiClient',

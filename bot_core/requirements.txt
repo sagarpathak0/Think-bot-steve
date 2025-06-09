@@ -14,9 +14,9 @@ torchvision
 pyttsx3
 SpeechRecognition
 google-generativeai
-edge_tts
-pygame
-pyaudio
+# edge_tts
+# pygame
+# pyaudio
 pandas
 seaborn
 sounddevice
