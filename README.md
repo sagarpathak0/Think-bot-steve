@@ -1,6 +1,7 @@
-# SteveRLBot (Think-Bot)
 
-SteveRLBot is a modular, voice-activated AI assistant and reinforcement learning (RL) agent. It combines computer vision, conversational AI, memory, multilingual support, and a DQN-based RL agent in a grid world. The codebase is organized for easy extension and maintenance.
+# Think-Bot (SteveRLBot)
+
+Think-Bot (SteveRLBot) is a modular, voice-activated AI assistant and reinforcement learning (RL) agent. It features a modern cyberpunk dashboard, conversational AI, persistent memory, device/robot control, computer vision, and a DQN-based RL agent. The codebase is organized for easy extension and deployment.
 
 ---
 
@@ -17,21 +18,22 @@ For a visual preview, see the `frontend/src/styles/globals.css` and the dashboar
 
 ---
 
+
 ## Features
 
-- **Web Dashboard**: Modern, multi-section dashboard (Astra/console style) for stats, chat, device control, and more.
-- **User Authentication**: Registration/login with email OTP, JWT-secured endpoints, and PostgreSQL user storage.
-- **Device/Robot Control**: Control robot movement (forward, back, left, right, stop) from the dashboard or API.
-- **Stats & Memory**: Per-user stats, mood, and conversation history, all stored in PostgreSQL.
-- **Computer Vision**: Face detection, object detection (YOLOv5), and OCR (Tesseract) via webcam.
-- **Conversational AI**: Uses Gemini AI for context-aware responses.
-- **Speech Recognition**: Wake word detection ("Steve") and command recognition.
-- **Text-to-Speech (TTS)**: Natural-sounding speech with Edge TTS and pygame audio playback.
-- **Memory**: Remembers conversation history and observations, persistent across restarts.
-- **Personality & Skills**: Tells jokes, gives time/weather, remembers preferences.
-- **Multilingual**: Detects and translates languages.
-- **Hardware Integration**: ESP8266 with ultrasonic sensor for obstacle detection.
-- **Reinforcement Learning**: DQN agent learns to navigate a grid world with obstacles and goals.
+- **Web Dashboard**: Modern, multi-section dashboard (Astra/cyberpunk style) for stats, chat, device control, and more (Next.js frontend)
+- **Modular Node.js Backend**: TypeScript backend with controllers, middleware, queries, and routes (see below)
+- **User Authentication**: Registration/login with email OTP, JWT-secured endpoints, and PostgreSQL user storage
+- **Conversational AI**: Uses Gemini AI for context-aware responses and conversation summaries
+- **Stats & Memory**: Per-user stats, mood, and conversation history, all stored in PostgreSQL
+- **Device/Robot Control**: Control robot movement (forward, back, left, right, stop) from the dashboard or API
+- **Computer Vision**: Face detection, object detection (YOLOv5), and OCR (Tesseract) via webcam
+- **Speech Recognition**: Wake word detection ("Steve") and command recognition
+- **Text-to-Speech (TTS)**: Natural-sounding speech with Edge TTS and pygame audio playback
+- **Personality & Skills**: Tells jokes, gives time/weather, remembers preferences
+- **Multilingual**: Detects and translates languages
+- **Hardware Integration**: ESP8266 with ultrasonic sensor for obstacle detection
+- **Reinforcement Learning**: DQN agent learns to navigate a grid world with obstacles and goals
 
 ## Memory System Details
 
@@ -45,9 +47,25 @@ For a visual preview, see the `frontend/src/styles/globals.css` and the dashboar
 
 ## Architecture
 
-The project uses a modular architecture with the following components:
+The project uses a modular, multi-language architecture:
 
-- `bot_core/`: Main package containing all modular components
+- `frontend/`: Next.js cyberpunk dashboard (Vercel-ready)
+- `backend/`: Node.js/TypeScript API (modular, Vercel-ready)
+- `bot_core/`: Python package for advanced AI, RL, and hardware integration
+- `RL/`: Standalone reinforcement learning agent
+### Backend (Node.js/TypeScript)
+
+- Modular structure: `controllers/`, `middleware/`, `queries/`, `routes/`, `utils/`
+- Endpoints: `/login`, `/chat`, `/memory`, `/stats` (see backend/README.md)
+- Uses PostgreSQL for storage and Gemini API for chat/summaries
+- Deployed as a serverless API on Vercel (see `backend/vercel.json`)
+
+### Frontend (Next.js)
+- Modern dashboard UI, cyberpunk theme, connects to backend via `NEXT_PUBLIC_API_BASE_URL`
+- Deployed on Vercel
+
+### Python Core (bot_core/)
+- Advanced AI, RL, and hardware integration (see `bot_core/README.md`)
   - `vision/`: Camera and image processing
     - `webcam_stream.py`: Handles webcam input with buffering controls
     - `vision_system.py`: YOLOv5 object detection integration
@@ -86,42 +104,65 @@ The project uses a modular architecture with the following components:
 
 ---
 
+
 ## Environment Variables
 
 All secrets and configuration are loaded from `.env` files. **Never commit secrets to git.**
 
-### Backend (`.env` in project root)
-
+### Backend (`backend/.env`)
+See `backend/README.md` for a full example. Main variables:
 ```
 PGDATABASE=thinkBot
-PGUSER=avnadmin
-PGPASSWORD=...           # Your PostgreSQL password
-PGHOST=...               # Your PostgreSQL host
-PGPORT=...               # Your PostgreSQL port
-GEMINI_API_KEY=...       # Google Gemini API key
-EMAIL=...                # Email address for OTP
-GOOGLE_CLIENT_ID=...     # Gmail OAuth2 client ID
-GOOGLE_CLIENT_SECRET=... # Gmail OAuth2 client secret
-GOOGLE_REFRESH_TOKEN=... # Gmail OAuth2 refresh token
-JWT_SECRET=...           # Secret for JWT signing
+PGUSER=your_db_user
+PGPASSWORD=your_db_password
+PGHOST=your_db_host
+PGPORT=your_db_port
+GEMINI_API_KEY=your_gemini_api_key
+GEMINI_API_KEY_2=your_gemini_api_key_2
+EMAIL=your_email
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+GOOGLE_REFRESH_TOKEN=your_google_refresh_token
+JWT_SECRET=your_jwt_secret
 ```
 
-### Frontend (`frontend/.env`)
-
+### Frontend (`frontend/.env.local`)
 ```
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+NEXT_PUBLIC_API_BASE_URL=https://<your-vercel-backend-url>
 ```
 
 ---
 
+
 ## Quick Start
 
-1. Create a `.env` file with all required secrets (see below)
+1. Create `.env` files for backend and frontend (see above)
 2. Set up hardware components (webcam, ultrasonic sensor, robot, etc.)
-3. Start the backend API: `python -m bot_core.api_server`
-4. Start the frontend: `cd frontend && npm install && npm run dev`
-5. Run `python -m bot_core.main` for the main assistant (optional)
-6. Run `python -m RL.main_loop` for the RL agent (optional)
+3. Start the backend:
+   - For Node.js backend: 
+     ```powershell
+     cd backend
+     npm install
+     npx ts-node src/index.ts
+     ```
+   - For Python backend (legacy/advanced):
+     ```powershell
+     python -m bot_core.api_server
+     ```
+4. Start the frontend:
+   ```powershell
+   cd frontend
+   npm install
+   npm run dev
+   ```
+5. (Optional) Run the main Python assistant:
+   ```powershell
+   python -m bot_core.main
+   ```
+6. (Optional) Run the RL agent:
+   ```powershell
+   python -m RL.main_loop
+   ```
 
 ---
 
@@ -173,21 +214,20 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 
 ---
 
+
 ## Deployment
 
-The application is fully deployed with:
+### Backend (Node.js/TypeScript)
+- Deploys as a serverless API on Vercel (see `backend/vercel.json`)
+- Set all environment variables in the Vercel dashboard
+- API base URL: `https://<your-vercel-backend-url>`
 
-- **Backend**: Flask app running on AWS EC2 with Gunicorn, Nginx, and SSL (via Certbot)
-- **Frontend**: Next.js app deployed on Vercel at [https://think-bot-steve.vercel.app](https://think-bot-steve.vercel.app)
-- **Domain**: Registered custom domain at [https://think-bot-steve.me](https://think-bot-steve.me)
+### Frontend (Next.js)
+- Deploys on Vercel (auto-detected)
+- Set `NEXT_PUBLIC_API_BASE_URL` in Vercel dashboard to your backend URL
 
-### Key Deployment Features:
-
-- HTTPS encryption with Let's Encrypt SSL certificates
-- Systemd service for reliable backend operation
-- Nginx as reverse proxy with proper CORS handling
-- Elastic IP for stable AWS addressing
-- JWT authentication for secure API access
+### Python Core (optional/legacy)
+- Can be deployed on a server/VM (see `DEPLOYMENT_GUIDE.txt`)
 
 For detailed deployment instructions, see [DEPLOYMENT_GUIDE.txt](./DEPLOYMENT_GUIDE.txt).
 
@@ -284,19 +324,18 @@ See `API_DOCS.txt` for full details. Here are the main endpoints:
 
 ---
 
-## Recent Changes (as of June 9, 2025)
 
-- **Deployment (June 9, 2025):**
-  - Fully deployed backend (Flask/Gunicorn) on AWS EC2 with Nginx reverse proxy and SSL/HTTPS via Certbot.
-  - Deployed frontend (Next.js) on Vercel, accessible at [https://think-bot-steve.vercel.app](https://think-bot-steve.vercel.app).
-  - Configured custom domain [https://think-bot-steve.me](https://think-bot-steve.me) with Elastic IP and DNS.
-  - Resolved all CORS, Python dependency (e.g., _cffi_backend for Certbot), and system package issues.
-  - Created comprehensive `DEPLOYMENT_GUIDE.txt`.
-- **Backend (June 9, 2025):**
-  - Updated `/stats` endpoint and `mood_utils.py` to consistently use the LLM-generated summary from `engine.memory.memory` if available, falling back to a basic concatenated summary. This ensures the stats page displays the same high-quality summary as other parts of the application.
-- **Security (June 5, 2025):** All secrets moved to `.env`, JWT for all user endpoints, PostgreSQL for all user/chat data.
-- **Frontend (June 5, 2025):** Modern dashboard layout, Astra theme, device control panel, and improved navigation.
-- **Backend (June 5, 2025):** New `/control` API for robot/device commands, all endpoints CORS and JWT protected.
-- **Docs (June 5, 2025):** See `API_DOCS.txt` for all API endpoints, input/output, and authentication.
+## Recent Changes (as of June 11, 2025)
 
-This README is up to date as of June 9, 2025.
+- **Backend:**
+  - Migrated to modular Node.js/TypeScript backend (controllers, middleware, queries, routes, utils)
+  - Vercel deployment with `vercel.json` (serverless API)
+  - All endpoints use conversation summaries for context
+  - All business logic modularized for maintainability
+- **Frontend:**
+  - Modern cyberpunk dashboard (Next.js, Vercel)
+  - API base URL now points to Vercel backend
+- **Docs:**
+  - Updated backend and main project README for new architecture and deployment
+
+This README is up to date as of June 11, 2025.
