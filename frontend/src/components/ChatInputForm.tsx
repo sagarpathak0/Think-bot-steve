@@ -19,19 +19,16 @@ export default function ChatInputForm({ input, setInput, sending, loading, onSub
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!displayInput.trim()) return;
-    // Replace input with truncated version if needed
+    // If truncated, update the input state before submitting
     if (isTruncated) {
       setInput(words.slice(0, WORD_LIMIT).join(" "));
+      // Wait for state update before submitting
+      setTimeout(() => {
+        onSubmit(e);
+      }, 0);
+    } else {
+      onSubmit(e);
     }
-    // Call parent onSubmit with truncated message
-    const fakeEvent = {
-      ...e,
-      target: {
-        ...e.target,
-        value: words.slice(0, WORD_LIMIT).join(" ")
-      }
-    };
-    onSubmit(fakeEvent as any);
   };
 
   return (

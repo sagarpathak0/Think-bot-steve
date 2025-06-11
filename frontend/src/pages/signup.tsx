@@ -1,11 +1,20 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import CyberpunkNavbar from "../components/CyberpunkNavbar";
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export default function SignupPage() {
+  const router = useRouter();
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('jwt_token');
+      if (token) {
+        router.replace('/chat');
+      }
+    }
+  }, []);
   const [step, setStep] = useState(1); // 1: email, 2: otp, 3: username/pass
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
@@ -15,7 +24,7 @@ export default function SignupPage() {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [info, setInfo] = useState("");
-  const router = useRouter();
+  // (router already declared above)
 
   // Step 1: Send OTP
   const handleSendOtp = async (e: React.FormEvent) => {

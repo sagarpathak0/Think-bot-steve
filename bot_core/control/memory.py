@@ -81,7 +81,8 @@ class Memory:
         return results
     
     def update_summary(self, ai):
-        """Update the running summary using Gemini"""
+        """Update the running summary using Gemini (use GEMINI_API_KEY_2 if available)"""
+        import os
         # Use all conversation history for summarization
         history = self.memory["conversation_history"]
         if not history:
@@ -90,13 +91,21 @@ class Memory:
         convo_text = "\n".join([f"{c['speaker']}: {c['message']}" for c in history])
         prompt = (
             "You are an expert conversation summarizer. Read the following full conversation between a user and an AI assistant. "
-            "Write a detailed, well-structured summary that captures all important facts, names, context, and the flow of the discussion. "
+            "Write a concise summary that captures the main points, topics discussed, and any key decisions or facts mentioned. "
+            "The summary should be clear, informative, and suitable for use as context in future conversations. "
             "Do NOT simply repeat the conversation line by line. Instead, synthesize the main ideas, topics, and any key decisions or facts mentioned. "
-            "If the conversation is long, your summary can be as long as needed to cover all relevant points, but avoid unnecessary repetition. "
             "This summary will be used as context for future conversations, so make it as informative and clear as possible.\n\n"
             f"{convo_text}\n\nSummary:"
         )
-        summary = ai.ask(prompt)
+        # Use GEMINI_API_KEY_2 for summary if available
+        api_key_2 = os.environ.get("GEMINI_API_KEY_2")
+        if api_key_2:
+            # If ai is a GeminiClient, create a temp one with API_KEY_2 just for summary
+            from bot_core.ai.gemini_client import GeminiClient
+            summary_ai = GeminiClient(api_key=api_key_2)
+            summary = summary_ai.ask(prompt)
+        else:
+            summary = ai.ask(prompt)
         self.memory["summary"] = summary
         self.save_memory()
 

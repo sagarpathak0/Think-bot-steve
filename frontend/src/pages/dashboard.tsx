@@ -241,6 +241,20 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [theme, setTheme] = useState<'cyberpunk' | 'dark'>("cyberpunk");
   const [systemStatus, setSystemStatus] = useState<'online' | 'warning' | 'offline'>("online");
+  const [username, setUsername] = useState<string>("");
+
+  // Fetch username for personalized welcome and summary context
+  useEffect(() => {
+    const token = localStorage.getItem("jwt_token");
+    if (!token) return;
+    fetch(`${BASE_URL}/me`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.username) setUsername(data.username);
+      });
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("jwt_token");
@@ -339,8 +353,8 @@ export default function Dashboard() {
         <main className="flex-1 min-w-[320px] max-w-3xl mx-auto md:mx-0 bg-opacity-80 rounded-2xl p-6 md:p-8 shadow-xl backdrop-blur-md border border-blue-900 flex flex-col gap-6 animate-glow-card" style={{background: theme === 'cyberpunk' ? "rgba(24,28,48,0.92)" : "rgba(20,20,20,0.92)"}}>
           <AITipsWidget />
           <section>
-            <h2 className="text-2xl font-bold mb-2">Welcome{memory && memory.conversation && memory.conversation.length > 0 ? `, ${memory.conversation[memory.conversation.length-1].speaker === 'user' ? 'User' : 'Steve'}` : ''}!</h2>
-            <SummaryCard summary={stats?.summary || "No summary yet."} className="mb-2" />
+            <h2 className="text-2xl font-bold mb-2">{username ? `Welcome, ${username}!` : "Welcome!"}</h2>
+            <SummaryCard summary={stats?.summary ? `${username ? `[User: ${username}]\n` : ''}${stats.summary}` : "No summary yet."} className="mb-2" />
             <div className="mb-2"><strong>Mood:</strong> {typeof stats?.avg_mood === 'number' ? (stats.avg_mood > 0.1 ? "😊" : stats.avg_mood < -0.1 ? "😞" : "😐") : "-"} ({typeof stats?.avg_mood === 'number' ? stats.avg_mood.toFixed(2) : "-"})</div>
             <div className="mb-2"><strong>Messages Today:</strong> {typeof stats?.count === 'number' ? stats.count : "-"}</div>
             <div className="flex flex-col gap-2 mt-4">

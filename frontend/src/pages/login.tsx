@@ -1,15 +1,24 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import CyberpunkNavbar from "../components/CyberpunkNavbar";
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export default function LoginPage() {
+  const router = useRouter();
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('jwt_token');
+      if (token) {
+        router.replace('/chat');
+      }
+    }
+  }, []);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const router = useRouter();
+  // (router already declared above)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
