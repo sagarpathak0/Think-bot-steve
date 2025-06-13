@@ -1,5 +1,4 @@
 import Link from "next/link";
-import CyberpunkNavbar from "@/components/CyberpunkNavbar";
 import { DemoHeroGeometric } from "@/components/DemoHeroGeometric";
 
 export default function Home() {
@@ -12,7 +11,7 @@ export default function Home() {
         fontFamily: "'Share Tech Mono', 'VT323', 'Fira Mono', monospace",
       }}
     >
-      <CyberpunkNavbar />
+      {/* <CyberpunkNavbar /> */}
       {/* New Hero Section */}
       <DemoHeroGeometric />
       {/* Existing homepage content below */}
