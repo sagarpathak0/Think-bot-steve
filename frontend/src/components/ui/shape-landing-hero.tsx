@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { Circle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { NavbarDemo } from "../NavbarDemo";
 
 function ElegantShape({
   className,
