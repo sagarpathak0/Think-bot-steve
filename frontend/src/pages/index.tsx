@@ -1,6 +1,6 @@
-
 import Link from "next/link";
-import CyberpunkNavbar from "../components/CyberpunkNavbar";
+import CyberpunkNavbar from "@/components/CyberpunkNavbar";
+import { DemoHeroGeometric } from "@/components/DemoHeroGeometric";
 
 export default function Home() {
   return (
@@ -9,12 +9,15 @@ export default function Home() {
       style={{
         background: "linear-gradient(135deg, #0a001a 60%, #1a0033 100%)",
         color: "#e0e0ff",
-        fontFamily: "\'Share Tech Mono\', \'VT323\', \'Fira Mono\', monospace",
+        fontFamily: "'Share Tech Mono', 'VT323', 'Fira Mono', monospace",
       }}
     >
       <CyberpunkNavbar />
+      {/* New Hero Section */}
+      <DemoHeroGeometric />
+      {/* Existing homepage content below */}
       <div className="hud-lines" />
-      <div className="max-w-2xl mx-auto p-8 neon-border holo shadow-lg relative z-10 rounded-2xl text-center" style={{marginTop: '6rem'}}>
+      {/* <div className="max-w-2xl mx-auto p-8 neon-border holo shadow-lg relative z-10 rounded-2xl text-center" style={{marginTop: '6rem'}}>
         <h1 className="text-5xl font-bold glitch mb-4 tracking-widest">STEVE <span className="flicker" style={{color:'var(--neon-pink)'}}>Think-Bot</span> <span className="flicker" style={{color:'var(--neon-blue)'}}>AI</span></h1>
         <p className="text-xl mb-6 text-neon-blue">Your modular cyberpunk AI assistant</p>
         <ul className="text-lg mb-8 text-left mx-auto max-w-xl cyberpunk-section-text" style={{color:'#b0eaff'}}>
@@ -32,7 +35,7 @@ export default function Home() {
             Today&apos;s Stats
           </Link>
         </div>
-      </div>
+      </div> */}
       {/* Floating chat icon */}
       <Link
         href="/chat"
