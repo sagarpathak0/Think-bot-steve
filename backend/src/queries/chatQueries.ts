@@ -20,8 +20,11 @@ export const getUsername = async (user_id: number) => {
 };
 
 export const getConversationHistory = async (user_id: number) => {
+  // Get the most recent 25 messages, then reverse to oldest-to-newest
   const { rows } = await pool.query(
-    'SELECT speaker, message FROM conversation_history WHERE user_id=$1 ORDER BY timestamp ASC LIMIT 30',
+    `SELECT speaker, message FROM (
+      SELECT speaker, message, timestamp FROM conversation_history WHERE user_id=$1 ORDER BY timestamp DESC LIMIT 25
+    ) sub ORDER BY timestamp ASC`,
     [user_id]
   );
   return rows;
@@ -34,8 +37,11 @@ export const insertSummary = (user_id: number, summary: string) =>
   );
 
 export const getMemoryHistory = async (user_id: number) => {
+  // Get the most recent 25 messages, then reverse to oldest-to-newest
   const { rows } = await pool.query(
-    'SELECT timestamp, speaker, message FROM conversation_history WHERE user_id=$1 ORDER BY timestamp ASC LIMIT 30',
+    `SELECT timestamp, speaker, message FROM (
+      SELECT timestamp, speaker, message FROM conversation_history WHERE user_id=$1 ORDER BY timestamp DESC LIMIT 25
+    ) sub ORDER BY timestamp ASC`,
     [user_id]
   );
   return rows;
