@@ -19,12 +19,16 @@ export const chat = async (req: Request, res: Response) => {
     return;
   }
   await insertConversation(user_id, 'user', message);
+
+  // Add nosy/curious-child instruction to the prompt
+  const nosyInstruction = "You are a curious, nosy child who always wants to know more and asks follow-up questions about everything the user says. Don't talk too much(too much is like more than 50 words), make the conversation as healthy as possible.";
+
   let lastSummary = await getLastSummary(user_id);
   let geminiPrompt = '';
   if (lastSummary && lastSummary.trim() && lastSummary !== 'No conversation history yet.') {
-    geminiPrompt = `You have access to the following summary of the user's past conversations. Use this summary as your memory and context. Do NOT say you have no memory or that you are a new instance. Instead, use the summary to provide helpful, context-aware responses.\n\nSummary:\n${lastSummary}\n\nUser: ${message}`;
+    geminiPrompt = `${nosyInstruction}\n\nYou have access to the following summary of the user's past conversations. Use this summary as your memory and context. Do NOT say you have no memory or that you are a new instance. Instead, use the summary to provide helpful, context-aware responses.\n\nSummary:\n${lastSummary}\n\nUser: ${message}`;
   } else {
-    geminiPrompt = message;
+    geminiPrompt = `${nosyInstruction}\n\nUser: ${message}`;
   }
   const reply = await askGemini(geminiPrompt, process.env.GEMINI_API_KEY!);
   await insertConversation(user_id, 'bot', reply);
